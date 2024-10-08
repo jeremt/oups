@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+dependencies:
+  pocketbase:
+    specifier: ^0.21.5
+    version: 0.21.5
+
 devDependencies:
   '@playwright/test':
     specifier: ^1.28.1
@@ -1616,6 +1621,10 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
+
+  /pocketbase@0.21.5:
+    resolution: {integrity: sha512-bnI/uinnQps+ElSlzxkc4yvwuSFfKcoszDtXH/4QT2FhGq2mJVUvDlxn+rjRXVntUjPfmMG5LEPZ1eGqV6ssog==}
+    dev: false
 
   /postcss-load-config@3.1.4(postcss@8.4.47):
     resolution: {integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==}
