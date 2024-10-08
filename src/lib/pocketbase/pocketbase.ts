@@ -1,7 +1,7 @@
 import { POCKETBASE_BASE_URL } from '$env/static/private';
 import PocketBase, { type RecordService } from 'pocketbase';
 
-interface User {
+export interface User {
 	id: string;
 	username: string;
 	email: string;
@@ -15,7 +15,7 @@ interface User {
 		company: Company;
 	};
 }
-interface Client {
+export interface Client {
 	id: string;
 	name: string;
 	email?: string;
@@ -24,7 +24,7 @@ interface Client {
 	updated?: string;
 }
 
-interface Company {
+export interface Company {
 	id: string;
 	name: string;
 	logo: string;
@@ -32,11 +32,13 @@ interface Company {
 	bic: string;
 	iban: string;
 	siren: string;
+	phone: string;
+	email: string;
 	created: string;
 	updated?: string;
 }
 
-interface Organization {
+export interface Organization {
 	id: string;
 	name: string;
 	logo: string;
@@ -49,17 +51,17 @@ interface Organization {
 	};
 }
 
-type Status = 'generated' | 'sent' | 'paid' | 'declared';
-interface Line {
+export type InvoiceStatus = 'generated' | 'sent' | 'paid' | 'declared';
+export interface Line {
 	price: number;
 	quantity?: number;
 	description: string;
 }
-interface Invoice {
+export interface Invoice {
 	id: string;
 	name: string;
 	emission_date: string;
-	status: Status;
+	status: InvoiceStatus;
 	client_id: string;
 	company_id: string;
 	organization_id: string;
@@ -75,7 +77,26 @@ interface Invoice {
 	};
 }
 
-type Quote = Invoice;
+export type QuoteStatus = 'generated' | 'sent' | 'accepted' | 'declined';
+export interface Quote {
+	id: string;
+	name: string;
+	emission_date: string;
+	status: InvoiceStatus;
+	client_id: string;
+	company_id: string;
+	organization_id: string;
+	lines: Line[];
+	quantity_label: string;
+	created: string;
+	updated?: string;
+	//
+	expand?: {
+		company_id: Company;
+		client_id: Client;
+		organization_id: Organization;
+	};
+}
 
 interface TypedPocketBase extends PocketBase {
 	collection(idOrName: string): RecordService; // default fallback for any other collection
