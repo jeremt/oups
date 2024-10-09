@@ -19,11 +19,14 @@ export async function POST({ request }) {
 	}
 	const { current_invoice_number } = await pb.collection('companies').getOne(data.company_id);
 
-	const invoice = await pb.collection('invoices').create({
-		...data,
-		number: current_invoice_number + 1,
-		status: 'generated'
-	});
+	const invoice = await pb.collection('invoices').create(
+		{
+			...data,
+			number: current_invoice_number + 1,
+			status: 'generated'
+		},
+		{ expand: 'company_id,client_id,organization_id' }
+	);
 	await pb.collection('companies').update(data.company_id, {
 		current_invoice_number: current_invoice_number + 1
 	});

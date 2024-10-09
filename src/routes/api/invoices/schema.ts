@@ -1,6 +1,21 @@
 import Ajv from 'ajv';
 const ajv = new Ajv({ removeAdditional: true });
 
+const linesSchema = {
+	type: 'array',
+	items: {
+		type: 'object',
+		properties: {
+			description: {
+				type: 'string'
+			},
+			price: {
+				type: 'number'
+			}
+		},
+		required: ['description', 'price']
+	}
+};
 export const verifyAddInvoice = ajv.compile({
 	$schema: 'http://json-schema.org/draft-07/schema#',
 	type: 'object',
@@ -19,24 +34,7 @@ export const verifyAddInvoice = ajv.compile({
 			type: 'string',
 			format: 'date'
 		},
-		lines: {
-			type: 'array',
-			items: {
-				type: 'object',
-				properties: {
-					description: {
-						type: 'string'
-					},
-					price: {
-						type: 'number'
-					}
-				},
-				required: ['description', 'price']
-			}
-		},
-		number: {
-			type: 'number'
-		},
+		lines: linesSchema,
 		organisation_id: {
 			type: 'string'
 		},
@@ -50,8 +48,23 @@ export const verifyAddInvoice = ajv.compile({
 		'emission_date',
 		'lines',
 		'name',
-		'number',
 		'organisation_id',
 		'quantity_label'
 	]
+});
+
+export const verifyUpdateInvoice = ajv.compile({
+	$schema: 'http://json-schema.org/draft-07/schema#',
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		status: { type: 'string', enum: ['generated', 'sent', 'paid', 'declared'] },
+		company_id: { type: 'string' },
+		client_id: { type: 'string' },
+		organization_id: { type: 'string' },
+		emission_date: { type: 'string', format: 'date' },
+		name: { type: 'string' },
+		lines: linesSchema,
+		quantity_label: { type: 'string' }
+	}
 });
