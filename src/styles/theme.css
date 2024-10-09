@@ -1,105 +1,98 @@
 /* Theme */
 
 :root {
-	--font-brand: 'Bricolage Grotesque', sans-serif; /* The font that is mainly used on the website */
-	--color-black: #151515;
-	--color-black-1: #333333;
-	--color-white: #ffffff;
-	--color-white-1: #cccccc;
-	--color-gray: #888888;
-	--color-indigo: #5956de;
-	--color-lime: #cbfb44;
-	--color-yellow: #fff746;
-	--color-pink: #ff76ce;
-	--color-purple: #9b48df;
-	--color-cyan: #6bfffe;
-	--color-red: #d74242; /* Used for errors, usually some kind of red */
-	--color-primary: var(--color-indigo);
-	--color-link-visited: var(--color-purple);
-	--color-error: var(--color-red);
+    --font-brand: 'Bricolage Grotesque', sans-serif; /* The font that is mainly used on the website */
+    --color-black: #151515;
+    --color-black-1: #333333;
+    --color-white: #ffffff;
+    --color-white-1: #cccccc;
+    --color-gray: #888888;
+    --color-indigo: #5956de;
+    --color-lime: #cbfb44;
+    --color-yellow: #fff746;
+    --color-pink: #ff76ce;
+    --color-purple: #9b48df;
+    --color-cyan: #6bfffe;
+    --color-red: #d74242; /* Used for errors, usually some kind of red */
+    --color-primary: var(--color-indigo);
+    --color-link-visited: var(--color-purple);
+    --color-error: var(--color-red);
 }
 
 html[color-scheme='dark'] {
-	--color-fg: var(--color-white);
-	--color-fg-1: var(--color-white-1);
-	--color-fg-2: var(--color-gray);
-	--color-bg: var(--color-black);
-	--color-bg-1: var(--color-black-1);
+    --color-fg: var(--color-white);
+    --color-fg-1: var(--color-white-1);
+    --color-fg-2: var(--color-gray);
+    --color-bg: var(--color-black);
+    --color-bg-1: var(--color-black-1);
 }
 
 html[color-scheme='light'] {
-	--color-fg: var(--color-black);
-	--color-fg-1: var(--color-black-1);
-	--color-fg-2: var(--color-gray);
-	--color-bg: var(--color-white);
-	--color-bg-1: var(--color-white-1);
+    --color-fg: var(--color-black);
+    --color-fg-1: var(--color-black-1);
+    --color-fg-2: var(--color-gray);
+    --color-bg: var(--color-white);
+    --color-bg-1: var(--color-white-1);
 }
 
 /* Root */
 
 body,
 #root {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-	margin: 0;
-	font-family: var(--font-brand);
-	color: var(--color-fg);
-	background-color: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    font-family: var(--font-brand);
+    color: var(--color-fg);
+    background-color: var(--color-bg);
 }
 
 /* Button */
 
 a[role='button'].btn,
 button.btn {
-	color: var(--fg, var(--color-area));
-	background: var(--bg, var(--color-fg));
-	border: none;
-	transition: var(--transition, all 0.3s);
-	font-family: var(--font-ui);
-	font-weight: bold;
-	border-radius: 0.8em;
+    color: var(--fg, var(--color-bg));
+    background: var(--bg, var(--color-fg));
+    border: none;
+    transition: var(--transition, all 0.3s);
+    font-family: var(--font-ui);
+    font-weight: bold;
+    border-radius: 0.8em;
 
-	&:hover {
-		translate: 0 -0.1em;
-		border-radius: 1em;
-	}
-	&:active {
-		translate: 0 0.2em;
-		border-radius: 0.8em;
-	}
-	&:disabled {
-		color: var(--theme-colors-dimmed);
-		cursor: default;
-		pointer-events: none;
-		background-color: var(--theme-colors-area);
-	}
+    &:hover {
+        translate: 0 -0.1em;
+        border-radius: 1em;
+    }
+    &:active {
+        translate: 0 0.2em;
+        border-radius: 0.8em;
+    }
+    &:disabled {
+        cursor: default;
+        opacity: 0.5;
+        pointer-events: none;
+    }
 
-	&.loading {
-		cursor: default;
-		pointer-events: none;
-		filter: brightness(0.8);
-	}
-
-	/* padding should only be based on text not icons */
-	& > svg {
-		margin: -1rem 0;
-	}
+    /* padding should only be based on text not icons */
+    & > svg {
+        margin: -1rem 0;
+    }
 }
 
 a[role='button'].btn > svg,
-button > svg {
-	color: var(--fg, var(--color-area));
+button.btn > svg {
+    color: var(--fg, var(--color-fg));
 }
 
 /* Select */
 
 select {
-	border-radius: 0.8em;
+    border-radius: 0.8em;
 }
 
 /* Tables */
 th,
 td {
-	border: 2px solid var(--color-bg-1);
+    border: 2px solid var(--color-bg-1);
 }

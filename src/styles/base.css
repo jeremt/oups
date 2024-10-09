@@ -3,43 +3,57 @@
 *,
 *::before,
 *::after {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
-a[role='button'],
-button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+a[role='button'].btn,
+button.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-	gap: 0.5em;
-	padding: 0.8em 1em;
-	font-size: var(--font-size, 0.85rem);
+    gap: 0.5em;
+    padding: 0.8em 1em;
+    font-size: var(--font-size, 0.85rem);
 
-	cursor: pointer;
-	user-select: none;
-	text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+}
+
+button.icon,
+a[role='button'].icon {
+    color: var(--color-fg);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 select {
-	cursor: pointer;
-	border: none;
-	outline: none;
-	padding: 0.8em 1em;
-	margin-bottom: 1rem;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 0.8em 1em;
+    margin-bottom: 1rem;
 }
 
 table {
-	border-collapse: collapse;
+    border-collapse: collapse;
 }
 
 th,
 td {
-	text-align: start;
-	padding: 0.5rem 1rem;
+    text-align: start;
+    padding: 0.5rem 1rem;
 }
 
 .grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(var(--col, 15rem), 1fr));
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--col, 15rem), 1fr));
 }
