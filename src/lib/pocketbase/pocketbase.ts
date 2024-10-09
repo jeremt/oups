@@ -79,6 +79,7 @@ export interface Invoice {
     organization_id?: string;
     lines: Line[];
     quantity?: Quantity;
+    note: string;
     created: string;
     updated?: string;
     //
@@ -101,6 +102,7 @@ export interface Quote {
     organization_id: string;
     lines: Line[];
     quantity: Quantity;
+    note: string;
     created: string;
     updated?: string;
     //
