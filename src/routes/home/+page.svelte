@@ -69,17 +69,12 @@ France`
 			font-weight: bold;
 		}
 	}
-	th,
-	td {
+	th {
 		text-align: start;
 		padding: 0.5rem 1rem;
 	}
 
 	th {
 		white-space: nowrap;
-	}
-
-	td {
-		color: var(--color-muted);
 	}
 </style>
