@@ -14,7 +14,7 @@ button.btn {
 
     gap: 0.5em;
     padding: 0.8em 1em;
-    font-size: var(--font-size, 0.85rem);
+    font-size: var(--font-size, 0.9rem);
 
     cursor: pointer;
     user-select: none;
@@ -33,6 +33,12 @@ a[role='button'].icon {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+input[type='text'],
+input[type='password'],
+input[type='email'] {
+    padding: 0.8em;
 }
 
 select {

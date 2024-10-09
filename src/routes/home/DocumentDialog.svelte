@@ -202,6 +202,7 @@
                 padding: 0 calc(8px * var(--ratio));
                 height: calc(25px * var(--ratio));
                 border-width: calc(1px * var(--ratio));
+                border-color: var(--color-white-2);
             }
         }
     }

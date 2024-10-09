@@ -1,6 +1,5 @@
 <script lang="ts">
     import ColorSchemeToggle from '$lib/color-scheme/ColorSchemeToggle.svelte';
-    import type {Client} from '$lib/pocketbase/pocketbase.js';
     import DocumentDialog from './DocumentDialog.svelte';
     import TableLine from './TableLine.svelte';
 
@@ -14,7 +13,7 @@
         <div class="logo">Oups.</div>
         <a href="#invoices">Factures</a>
         <a href="#quotes" style:margin-right="auto">Devis</a>
-        <button class="btn" onclick={() => (isDocumentOpen = true)}>Nouvelle facture</button>
+        <button class="btn" onclick={() => (isDocumentOpen = true)}>Créer</button>
         <ColorSchemeToggle />
         <a href="/logout" data-sveltekit-reload>Se déconnecter</a>
     </header>
@@ -43,6 +42,7 @@
     main {
         width: 100%;
         max-width: 65rem;
+        padding: 0 2rem;
         margin-inline: auto;
         display: flex;
         align-items: center;

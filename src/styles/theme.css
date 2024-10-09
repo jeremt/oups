@@ -3,9 +3,11 @@
 :root {
     --font-brand: 'Bricolage Grotesque', sans-serif; /* The font that is mainly used on the website */
     --color-black: #151515;
-    --color-black-1: #333333;
+    --color-black-1: #666666;
+    --color-black-2: #aaaaaa;
     --color-white: #ffffff;
-    --color-white-1: #cccccc;
+    --color-white-1: #eeeeee;
+    --color-white-2: #cccccc;
     --color-gray: #888888;
     --color-indigo: #5956de;
     --color-lime: #cbfb44;
@@ -25,6 +27,7 @@ html[color-scheme='dark'] {
     --color-fg-2: var(--color-gray);
     --color-bg: var(--color-black);
     --color-bg-1: var(--color-black-1);
+    --color-bg-2: var(--color-black-2);
 }
 
 html[color-scheme='light'] {
@@ -33,6 +36,7 @@ html[color-scheme='light'] {
     --color-fg-2: var(--color-gray);
     --color-bg: var(--color-white);
     --color-bg-1: var(--color-white-1);
+    --color-bg-2: var(--color-white-2);
 }
 
 /* Root */
@@ -58,15 +62,14 @@ button.btn {
     transition: var(--transition, all 0.3s);
     font-family: var(--font-ui);
     font-weight: bold;
-    border-radius: 0.8em;
+    border-radius: 0.5em;
 
     &:hover {
         translate: 0 -0.1em;
-        border-radius: 1em;
     }
     &:active {
         translate: 0 0.2em;
-        border-radius: 0.8em;
+        border-radius: 0.5em;
     }
     &:disabled {
         cursor: default;
@@ -85,6 +88,26 @@ button.btn > svg {
     color: var(--fg, var(--color-fg));
 }
 
+/* Inputs */
+
+input[type='text'],
+input[type='password'],
+input[type='email'] {
+    border: 2px solid var(--color-bg-2);
+    border-radius: 0.5em;
+    background-color: var(--color-bg-1);
+    &:focus {
+        border: 2px solid var(--color-primary);
+    }
+}
+
+/* labels */
+
+label {
+    font-size: 0.9rem;
+    color: var(--color-fg-1);
+}
+
 /* Links */
 
 a {
@@ -94,11 +117,11 @@ a {
 /* Select */
 
 select {
-    border-radius: 0.8em;
+    border-radius: 0.5em;
 }
 
 /* Tables */
 th,
 td {
-    border: 2px solid var(--color-bg-1);
+    border: 2px solid var(--color-bg-2);
 }
