@@ -53,7 +53,7 @@ body,
 a[role='button'].btn,
 button.btn {
     color: var(--fg, var(--color-bg));
-    background: var(--bg, var(--color-fg));
+    background: var(--bg, var(--color-primary));
     border: none;
     transition: var(--transition, all 0.3s);
     font-family: var(--font-ui);
@@ -83,6 +83,12 @@ button.btn {
 a[role='button'].btn > svg,
 button.btn > svg {
     color: var(--fg, var(--color-fg));
+}
+
+/* Links */
+
+a {
+    color: var(--color-primary);
 }
 
 /* Select */

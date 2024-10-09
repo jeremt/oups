@@ -51,6 +51,8 @@ export async function GET() {
                 bic: 'AGRIFRPP882',
                 iban: 'FR76 1820 6000 5165 0085 3209 021',
                 siren: '853 291 268',
+                email: 'taboada.jeremie@gmail.com',
+                phone: '06 24 91 22 44',
             },
         },
     } as Invoice;
@@ -72,6 +74,7 @@ export async function GET() {
         page.drawText(line, {font, size: 12});
         page.moveDown(lineHeight);
     }
+    page.moveDown(lineHeight / 2);
     if (company.phone) {
         page.drawText(company.phone, {font, size: 12});
         page.moveDown(lineHeight);
@@ -80,7 +83,7 @@ export async function GET() {
         page.drawText(company.email, {font, size: 12});
         page.moveDown(lineHeight);
     }
-    page.moveDown(lineHeight);
+    page.moveDown(lineHeight / 2);
     page.drawText(`SIREN : ${company.siren}`, {font, size: 12});
     page.moveDown(lineHeight);
     page.drawText(`Date d'émission : ${formatDate(new Date(invoice.emission_date))}`, {font, size: 12});
@@ -99,7 +102,7 @@ export async function GET() {
 
     // infos
     const title = `Facture nº${invoice.number} : ${invoice.name}`;
-    page.moveTo(50, page.getHeight() - 250);
+    page.moveTo(50, page.getHeight() - 260);
     page.drawText(title, {font: fontBold, size: 20});
 
     const priceWidth = 100;
@@ -120,7 +123,7 @@ export async function GET() {
         });
     }
 
-    y = page.getHeight() - 290;
+    y = page.getHeight() - 300;
     drawTextWithRect('Description', fontBold, {
         x: pageMargin,
         y,
@@ -175,8 +178,13 @@ export async function GET() {
     const totalText = `Total (HT) : ${invoice.lines.reduce((total, line) => total + line.price, 0)} €`;
     page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(totalText, 12) - pageMargin, y);
     page.drawText(totalText, {font: fontBold, size: 12});
+    page.moveTo(page.getWidth() - font.widthOfTextAtSize('TVA Non applicable', 12) - pageMargin, y - lineHeight);
+    page.drawText('TVA Non applicable', {font, size: 12});
 
-    page.moveTo(pageMargin, y - 25);
+    // payment infos
+    page.moveTo(pageMargin, y - 50);
+    page.drawText(`Informations de paiement`, {font: fontBold, size: 14});
+    page.moveDown(lineHeight);
     page.drawText(`BIC : ${company.bic}`, {font, size: 12});
     page.moveDown(lineHeight);
     page.drawText(`IBAN : ${company.iban}`, {font, size: 12});
