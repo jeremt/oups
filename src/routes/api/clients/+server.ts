@@ -3,7 +3,7 @@ import {verifyAddClient} from './schema.js';
 import type {Client} from '$lib/pocketbase/pocketbase.js';
 
 export async function GET({locals}) {
-    return json(await locals.pb_admin.collection('clients').getFullList());
+    return json(await locals.pbAdmin.collection('clients').getFullList());
 }
 
 export async function POST({request, locals}) {
@@ -11,5 +11,5 @@ export async function POST({request, locals}) {
     if (!verifyAddClient(data)) {
         throw error(400, verifyAddClient.errors?.join('  '));
     }
-    return json(await locals.pb_admin.collection('clients').create(data));
+    return json(await locals.pbAdmin.collection('clients').create(data));
 }

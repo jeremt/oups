@@ -6,11 +6,11 @@ export async function PATCH({params, request, locals}) {
     if (!verifyUpdateClient(data)) {
         return error(400, verifyUpdateClient.errors?.join('  '));
     }
-    const client = await locals.pb_admin.collection('clients').update(params.id, data);
+    const client = await locals.pbAdmin.collection('clients').update(params.id, data);
     return json(client);
 }
 
 export async function DELETE({params, locals}) {
-    const deleted = await locals.pb_admin.collection('clients').delete(params.id);
+    const deleted = await locals.pbAdmin.collection('clients').delete(params.id);
     return json({deleted});
 }

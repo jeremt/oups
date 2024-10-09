@@ -64,6 +64,10 @@ export interface Line {
     quantity?: number;
     description: string;
 }
+export interface Quantity {
+    base: number;
+    label: string;
+}
 export interface Invoice {
     id: string;
     name: string;
@@ -74,7 +78,7 @@ export interface Invoice {
     company_id: string;
     organization_id: string;
     lines: Line[];
-    quantity_label: string;
+    quantity: Quantity;
     created: string;
     updated?: string;
     //
@@ -96,7 +100,7 @@ export interface Quote {
     company_id: string;
     organization_id: string;
     lines: Line[];
-    quantity_label: string;
+    quantity: Quantity;
     created: string;
     updated?: string;
     //
