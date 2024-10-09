@@ -34,6 +34,8 @@ export interface Company {
 	siren: string;
 	phone: string;
 	email: string;
+	current_quote_number: number;
+	current_invoice_number: number;
 	created: string;
 	updated?: string;
 }
@@ -60,6 +62,7 @@ export interface Line {
 export interface Invoice {
 	id: string;
 	name: string;
+	number: number;
 	emission_date: string;
 	status: InvoiceStatus;
 	client_id: string;
@@ -81,6 +84,7 @@ export type QuoteStatus = 'generated' | 'sent' | 'accepted' | 'declined';
 export interface Quote {
 	id: string;
 	name: string;
+	number: number;
 	emission_date: string;
 	status: InvoiceStatus;
 	client_id: string;

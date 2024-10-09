@@ -5,7 +5,6 @@
 
 	let { data } = $props();
 	let isOpen = $state(false);
-
 	const client: Client = {
 		id: 'salutlol',
 		name: 'Ada Tech School',
@@ -46,7 +45,7 @@ France`
 		<tbody>
 			{#each data.invoices as invoice}
 				<tr>
-					<td>{invoice.name} nº{invoice.id}</td>
+					<td>{invoice.name} nº{invoice.number}</td>
 					<td>{invoice.expand?.company_id.name}</td>
 					<td>{invoice.status}</td>
 					<td>{invoice.created}</td>
