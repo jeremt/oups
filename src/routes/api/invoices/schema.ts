@@ -32,7 +32,6 @@ export const verifyAddInvoice = ajv.compile({
         },
         emission_date: {
             type: 'string',
-            format: 'date',
         },
         lines: linesSchema,
         organisation_id: {
@@ -54,7 +53,7 @@ export const verifyUpdateInvoice = ajv.compile({
         company_id: {type: 'string'},
         client_id: {type: 'string'},
         organization_id: {type: 'string'},
-        emission_date: {type: 'string', format: 'date'},
+        emission_date: {type: 'string'},
         name: {type: 'string'},
         lines: linesSchema,
         quantity_label: {type: 'string'},
