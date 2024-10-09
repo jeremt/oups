@@ -1,5 +1,5 @@
 import {POCKETBASE_BASE_URL, POCKETBASE_ADMIN_EMAIL, POCKETBASE_ADMIN_PASSWORD} from '$env/static/private';
-import PocketBase, {type RecordService} from 'pocketbase';
+import PocketBase, {BaseAuthStore, LocalAuthStore, type RecordService} from 'pocketbase';
 
 export interface User {
     id: string;
@@ -118,10 +118,10 @@ export interface TypedPocketBase extends PocketBase {
 
 let _pb_admin: TypedPocketBase | undefined;
 
-export const pb = async () => new PocketBase(POCKETBASE_BASE_URL) as TypedPocketBase;
+export const pb = async (authStore: BaseAuthStore) => new PocketBase(POCKETBASE_BASE_URL, authStore) as TypedPocketBase;
 export const pb_admin = async () => {
     if (!_pb_admin) {
-        _pb_admin = await pb();
+        _pb_admin = await pb(new LocalAuthStore());
         await _pb_admin.admins.authWithPassword(POCKETBASE_ADMIN_EMAIL, POCKETBASE_ADMIN_PASSWORD);
     }
     return _pb_admin;

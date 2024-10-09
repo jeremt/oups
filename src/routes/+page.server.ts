@@ -7,16 +7,15 @@ export const actions = {
         const password = form.get('password')?.toString();
 
         if (!email || !password) {
-            return fail(400, {email, invalid: true});
+            return fail(400, {email, status: 'invalid', message: ''});
         }
 
         try {
-            const user = await locals.pb.collection('users').authWithPassword(email, password);
-            if (user.token) {
-                throw redirect(302, '/home');
-            }
+            await locals.pb.collection('users').authWithPassword(email, password);
         } catch (e: unknown) {
-            return fail(403, {email, failed: true, message: (e as object).toString()});
+            return fail(403, {email, status: 'login_failed', message: (e as object).toString()});
         }
+
+        throw redirect(302, '/home');
     },
 };

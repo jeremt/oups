@@ -12,7 +12,12 @@
         <input id="password" name="password" type="password" autocomplete="current-password" />
         <button type="submit">Login</button>
     </form>
-    <pre>{JSON.stringify(form)}</pre>
+    {#if form && form.status === 'invalid'}
+        Provide both email & password
+    {/if}
+    {#if form && form.status === 'login_failed'}
+        Login failed: {form.message}
+    {/if}
 </main>
 
 <style>

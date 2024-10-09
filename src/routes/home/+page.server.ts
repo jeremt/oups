@@ -1,9 +1,14 @@
+import {redirect} from '@sveltejs/kit';
+
 export async function load({locals}) {
-    const companies = await locals.pb_admin.collection('companies').getFullList();
-    const invoices = await locals.pb_admin.collection('invoices').getFullList({expand: 'company_id,client_id,organization_id'});
+    const user = await locals.getUser();
+    if (!user) throw redirect(302, '/');
+
+    const invoices = await locals.pbAdmin.collection('invoices').getFullList({expand: 'company_id,client_id,organization_id'});
+    const companies = await locals.pbAdmin.collection('companies').getFullList();
 
     return {
-        invoices,
         company: companies[0],
+        invoices,
     };
 }
