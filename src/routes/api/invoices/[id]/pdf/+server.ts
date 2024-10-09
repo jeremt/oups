@@ -187,6 +187,7 @@ export async function GET() {
         headers: {
             'Content-Type': 'application/pdf',
             'Content-Length': bytes.byteLength.toString(),
+            'Content-Disposition': `attachment; filename="facture-n${invoice.number}-${invoice.name.replace(' ', '-').toLowerCase()}.pdf"`,
         },
     });
 }
