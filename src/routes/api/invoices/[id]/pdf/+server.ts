@@ -21,6 +21,14 @@ export async function GET() {
             {price: 3200, description: 'Encadrement'},
             {price: 150, description: 'Réunions'},
             {price: 540, description: 'Mentorats'},
+            {
+                price: 12000,
+                description: `Un truc un peu compliqué :
+- qui doit être sur plusieurs lignes
+- pour tout expliquer dans le détail
+- ça passe en vrai`,
+            },
+            {price: 540, description: 'Mentorats'},
         ],
         name: 'Encadrement',
         number: 15,
@@ -127,26 +135,51 @@ export async function GET() {
         height: rowHeight,
     });
 
+    y -= rowHeight;
     for (const {price, description} of invoice.lines) {
-        y -= rowHeight;
-        drawTextWithRect(description, font, {
+        const lineCount = description.split('\n').length;
+        page.drawRectangle({
             x: pageMargin,
-            y,
+            y: y - rowHeight * (lineCount - 1),
             width: page.getWidth() - pageMargin * 2 - priceWidth,
-            height: rowHeight,
+            height: rowHeight * lineCount,
+            borderColor: grayscale(0.8),
+            borderWidth: 1,
         });
 
-        drawTextWithRect(`${price} €`, font, {
-            x: page.getWidth() - pageMargin - priceWidth,
-            y,
-            width: priceWidth,
-            height: rowHeight,
+        page.drawText(description, {
+            x: pageMargin + rowPadding,
+            y: y + rowPadding,
+            size: 12,
+            font,
         });
+
+        page.drawRectangle({
+            x: page.getWidth() - pageMargin - priceWidth,
+            y: y - rowHeight * (lineCount - 1),
+            width: priceWidth,
+            height: rowHeight * lineCount,
+            borderColor: grayscale(0.8),
+            borderWidth: 1,
+        });
+
+        page.drawText(`${price} €`, {
+            x: page.getWidth() - pageMargin - priceWidth + rowPadding,
+            y: y + rowPadding,
+            size: 12,
+            font,
+        });
+        y -= rowHeight * lineCount;
     }
 
     const totalText = `Total (HT) : ${invoice.lines.reduce((total, line) => total + line.price, 0)} €`;
-    page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(totalText, 12) - pageMargin, y - 25);
+    page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(totalText, 12) - pageMargin, y);
     page.drawText(totalText, {font: fontBold, size: 12});
+
+    page.moveTo(pageMargin, y - 25);
+    page.drawText(`BIC : ${company.bic}`, {font, size: 12});
+    page.moveDown(lineHeight);
+    page.drawText(`IBAN : ${company.iban}`, {font, size: 12});
 
     const bytes = await pdf.save();
 
