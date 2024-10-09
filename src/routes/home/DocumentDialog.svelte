@@ -25,6 +25,7 @@
                     />
                 </svg>
             </button>
+            <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Download PDF</a>
             <button class="btn">Sauvegarder</button>
         </header>
         <div class="invoice">
@@ -73,7 +74,8 @@
         & header {
             display: flex;
             width: 100%;
-            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
             margin-bottom: 1rem;
         }
     }

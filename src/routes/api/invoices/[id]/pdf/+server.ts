@@ -1,37 +1,6 @@
+import {formatDate} from '$lib/helpers/formatDate';
+import type {Invoice} from '$lib/pocketbase/pocketbase';
 import PDFDocument from 'pdfkit';
-
-interface Company {
-    name: string;
-    address: string;
-    city: string;
-    phone: string;
-}
-
-interface Client {
-    name: string;
-    address: string;
-    city: string;
-    email: string;
-}
-
-interface InvoiceItem {
-    description: string;
-    quantity: number;
-    rate: number;
-    amount: number;
-}
-
-interface InvoiceData {
-    invoiceNumber: string;
-    date: string;
-    dueDate: string;
-    company: Company;
-    client: Client;
-    items: InvoiceItem[];
-    subtotal: number;
-    tax: number;
-    total: number;
-}
 
 // Helper function to convert PDFKit document to Buffer
 async function getBuffer(doc: typeof PDFDocument): Promise<Buffer> {
@@ -45,91 +14,123 @@ async function getBuffer(doc: typeof PDFDocument): Promise<Buffer> {
 }
 
 export const GET = async () => {
-    // Sample invoice data - in real app, this might come from a database or query params
-    const invoiceData: InvoiceData = {
-        invoiceNumber: 'INV-2024-001',
-        date: '2024-03-20',
-        dueDate: '2024-04-20',
-        company: {
-            name: 'Tech Solutions Inc.',
-            address: '123 Business Street',
-            city: 'San Francisco, CA 94105',
-            phone: '(555) 123-4567',
-        },
-        client: {
-            name: 'John Smith',
-            address: '456 Client Avenue',
-            city: 'New York, NY 10001',
-            email: 'john.smith@example.com',
-        },
-        items: [
-            {
-                description: 'Web Development Services',
-                quantity: 40,
-                rate: 75,
-                amount: 3000,
-            },
-            {
-                description: 'UI/UX Design',
-                quantity: 20,
-                rate: 85,
-                amount: 1700,
-            },
+    const invoice = {
+        id: 'osef-invoice',
+        client_id: 'osef-client',
+        company_id: 'osef-company',
+        created: new Date().toString(),
+        emission_date: new Date().toString(),
+        lines: [
+            {price: 3200, description: 'Encadrement'},
+            {price: 150, description: 'Réunions'},
+            {price: 540, description: 'Mentorats'},
         ],
-        subtotal: 4700,
-        tax: 470,
-        total: 5170,
-    };
+        name: 'Encadrement',
+        number: 15,
+        status: 'generated',
+        expand: {
+            client_id: {
+                id: 'osef-client',
+                created: new Date().toString(),
+                name: 'Ada Tech School',
+                address: '28 rue du Petit Musc\n75004 Paris',
+                company_id: 'osef-company',
+            },
+            company_id: {
+                id: 'osef-company',
+                current_invoice_number: 14,
+                current_quote_number: 1,
+                created: new Date().toString(),
+                name: 'M JÉRÉMIE TABOADA ALVAREZ',
+                address: '11 rue de Pommard\n75012 Paris',
+                bic: 'AGRIFRPP882',
+                iban: 'FR76 1820 6000 5165 0085 3209 021',
+                siren: '853 291 268',
+            },
+        },
+    } as Invoice;
 
     // Create a new PDF document
     const doc = new PDFDocument({margin: 50});
 
-    // Add company logo (placeholder)
-    doc.rect(50, 50, 100, 50).stroke().fontSize(10).text('LOGO', 75, 70);
+    let x = 50;
+    let y = 50;
+    const width = 510;
 
-    // Company details
-    doc.fontSize(20)
-        .text('INVOICE', 275, 50)
-        .fontSize(10)
-        .text(invoiceData.company.name, 400, 50)
-        .text(invoiceData.company.address, 400, 65)
-        .text(invoiceData.company.city, 400, 80)
-        .text(invoiceData.company.phone, 400, 95);
+    // Company
+    const company = invoice.expand!.company_id;
+    doc.fontSize(12).text(company.name, x, y);
+    y += 20;
 
-    // Invoice details
-    doc.fontSize(12).text(`Invoice Number: ${invoiceData.invoiceNumber}`, 50, 130).text(`Date: ${invoiceData.date}`, 50, 150).text(`Due Date: ${invoiceData.dueDate}`, 50, 170);
+    for (const line of company.address.split('\n')) {
+        doc.text(line, x, y);
+        y += 20;
+    }
+    if (company.phone) {
+        doc.text(company.phone, x, y);
+        y += 20;
+    }
+    if (company.email) {
+        doc.text(company.email, x, y);
+        y += 20;
+    }
+    y += 20;
+    doc.text(`SIREN : ${company.siren}`, x, y);
+    y += 20;
 
-    // Client details
-    doc.fontSize(12)
-        .text('Bill To:', 50, 200)
-        .text(invoiceData.client.name, 50, 220)
-        .text(invoiceData.client.address, 50, 235)
-        .text(invoiceData.client.city, 50, 250)
-        .text(invoiceData.client.email, 50, 265);
+    doc.text(`Date d'émission : ${formatDate(new Date(invoice.emission_date))}`, x, y);
+    y += 20;
 
-    // Table header
-    const tableTop = 330;
-    doc.fontSize(10).text('Description', 50, tableTop).text('Quantity', 250, tableTop).text('Rate', 350, tableTop).text('Amount', 450, tableTop);
+    // client
+    const client = invoice.expand!.client_id;
+    x = 300;
+    y = 150;
+    doc.text(client.name, x, y, {align: 'right'});
+    y += 20;
+    for (const line of client.address.split('\n')) {
+        doc.text(line, x, y, {align: 'right'});
+        y += 20;
+    }
 
-    // Table content
-    let position = tableTop + 30;
-    invoiceData.items.forEach(item => {
-        doc.text(item.description, 50, position).text(item.quantity.toString(), 250, position).text(`$${item.rate}`, 350, position).text(`$${item.amount}`, 450, position);
-        position += 30;
-    });
+    x = 50;
+    y = 250;
+    const title = `Facture nº${invoice.number} : ${invoice.name}`;
+    doc.fontSize(20).text(title, x, y, {width});
 
-    // Totals
-    const totalsPosition = position + 30;
-    doc.text('Subtotal:', 350, totalsPosition)
-        .text(`$${invoiceData.subtotal}`, 450, totalsPosition)
-        .text('Tax (10%):', 350, totalsPosition + 20)
-        .text(`$${invoiceData.tax}`, 450, totalsPosition + 20)
-        .fontSize(12)
-        .text('Total:', 350, totalsPosition + 40)
-        .text(`$${invoiceData.total}`, 450, totalsPosition + 40);
+    // Infos
+    y += 30;
+    const priceWidth = 100;
+    const rowHeight = 25;
+    const rowPadding = 8;
 
-    // Footer
-    doc.fontSize(10).text('Thank you for your business!', 50, 700).text('Payment is due within 30 days', 50, 715);
+    doc.fontSize(12);
+    doc.rect(x, y, width - priceWidth, rowHeight)
+        .strokeColor('#cccccc')
+        .stroke();
+    doc.text(`Description`, x + rowPadding, y + rowPadding, {width: width - priceWidth});
+    doc.rect(x + width - priceWidth, y, priceWidth, rowHeight).stroke();
+    doc.text(`Prix (HT)`, x + rowPadding + width - priceWidth, y + rowPadding, {width: priceWidth});
+
+    for (const {price, description} of invoice.lines) {
+        y += rowHeight;
+        doc.rect(x, y, width - priceWidth, rowHeight).stroke();
+        doc.text(description, x + rowPadding, y + rowPadding, {width: width - priceWidth});
+        doc.rect(x + width - priceWidth, y, priceWidth, rowHeight).stroke();
+        doc.text(`${price} €`, x + rowPadding + width - priceWidth, y + rowPadding, {width: priceWidth});
+    }
+
+    y += rowHeight;
+    doc.rect(x, y, width - priceWidth, rowHeight).stroke();
+    doc.text('Total', x + rowPadding, y + rowPadding, {width: width - priceWidth});
+    doc.rect(x + width - priceWidth, y, priceWidth, rowHeight).stroke();
+    doc.text(`${invoice.lines.reduce((result, line) => result + line.price, 0)} €`, x + rowPadding + width - priceWidth, y + rowPadding, {width: priceWidth});
+
+    y += 50;
+    doc.fontSize(16).text('Informations de paiement', x, y);
+    y += 30;
+    doc.fontSize(12).text(`BIC : ${company.bic}`, x, y);
+    y += 20;
+    doc.text(`IBAN : ${company.iban}`, x, y);
 
     try {
         const buffer = await getBuffer(doc);
@@ -137,7 +138,7 @@ export const GET = async () => {
         return new Response(buffer, {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="invoice.pdf"',
+                'Content-Disposition': `attachment; filename="${title}.pdf"`,
                 'Content-Length': buffer.length.toString(),
             },
         });
