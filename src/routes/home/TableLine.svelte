@@ -16,7 +16,7 @@
     async function handleStatusChange(event: Event) {
         const select = event.target as HTMLSelectElement;
         status = select.value as InvoiceStatus;
-        const response = await fetch(`/api/invoices/${invoice.id}`, {
+        await fetch(`/api/invoices/${invoice.id}`, {
             method: 'PATCH',
             body: JSON.stringify({status}),
             headers: {
@@ -41,7 +41,7 @@
     <td>{formatDate(new Date(invoice.created))}</td>
     <td>{formatDate(new Date(invoice.emission_date))}</td>
     <td>{invoice.lines.reduce((total, l) => total + l.price, 0)}</td>
-    <td>+134 €</td>
+    <td class="note">{@html invoice.note}</td>
 </tr>
 
 <style>
@@ -62,5 +62,12 @@
         right: 0;
         bottom: 0;
         opacity: 0;
+    }
+
+    .note {
+        max-width: 15rem;
+        text-overflow: ellipsis;
+        text-wrap: nowrap;
+        overflow: hidden;
     }
 </style>
