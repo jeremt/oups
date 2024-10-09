@@ -32,13 +32,13 @@ export interface Client {
 export interface Company {
     id: string;
     name: string;
-    logo: string;
+    logo?: string;
     address: string;
     bic: string;
     iban: string;
     siren: string;
-    phone: string;
-    email: string;
+    phone?: string;
+    email?: string;
     current_quote_number: number;
     current_invoice_number: number;
     created: string;
@@ -76,16 +76,16 @@ export interface Invoice {
     status: InvoiceStatus;
     client_id: string;
     company_id: string;
-    organization_id: string;
+    organization_id?: string;
     lines: Line[];
-    quantity: Quantity;
+    quantity?: Quantity;
     created: string;
     updated?: string;
     //
     expand?: {
         company_id: Company;
         client_id: Client;
-        organization_id: Organization;
+        organization_id?: Organization;
     };
 }
 
