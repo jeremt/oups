@@ -20,8 +20,13 @@ export interface Client {
     name: string;
     email?: string;
     address: string;
+    company_id: string;
     created: string;
     updated?: string;
+    //
+    expand?: {
+        company: Company;
+    };
 }
 
 export interface Company {
