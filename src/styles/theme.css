@@ -58,18 +58,21 @@ a[role='button'].btn,
 button.btn {
     color: var(--fg, var(--color-bg));
     background: var(--bg, var(--color-primary));
-    border: none;
+    border: 2px solid var(--color-primary);
     transition: var(--transition, all 0.3s);
     font-family: var(--font-ui);
     font-weight: bold;
     border-radius: 0.5em;
+    outline: none;
 
     &:hover {
         translate: 0 -0.1em;
     }
     &:active {
         translate: 0 0.2em;
-        border-radius: 0.5em;
+    }
+    &:focus {
+        border: 2px solid var(--color-fg);
     }
     &:disabled {
         cursor: default;
