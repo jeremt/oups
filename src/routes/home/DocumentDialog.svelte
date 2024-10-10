@@ -134,7 +134,7 @@
                                     </div>
                                 </td>
                                 <td style:padding="0" style:border="none" style:width="{10 * ratio}px"
-                                    ><button class="remove-line icon" style:color="var(--color-fg-1)" onclick={() => invoice.lines.splice(i, 1)}
+                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => invoice.lines.splice(i, 1)}
                                         ><Trash --size="{ratio * 12}px" /></button
                                     ></td
                                 >
