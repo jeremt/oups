@@ -25,6 +25,7 @@
         <input id="password" name="password" type="password" autocomplete="current-password" />
         <button class="btn" type="submit" style:margin-top="0.5rem">Login</button>
     </form>
+
     <div style:color="var(--color-error)">
         {#if form && form.status === 'invalid'}
             L'email & le mot de passe sont requis.
@@ -33,6 +34,10 @@
             La connexion a échouée ({form.message}).
         {/if}
     </div>
+    <small style:max-width="20rem" style:color="var(--color-fg-2)" style:text-align="center">
+        Ce projet est (pour le moment) prévu pour un usage personnel, mais le code est <a href="https://github.com/jeremt/oups" target="_blank">open source</a>, donc vous pouvez
+        héberger vous-même une version du projet !
+    </small>
 </main>
 
 <style>
