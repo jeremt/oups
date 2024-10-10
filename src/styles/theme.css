@@ -99,6 +99,10 @@ textarea:not(.invisible) {
     border-radius: 0.5em;
     background-color: var(--color-bg-1);
     outline: none;
+    color: var(--color-fg);
+    &::placeholder {
+        color: var(--color-fg-2);
+    }
     transition: 0.3s border;
     &:hover,
     &:focus {
@@ -117,6 +121,10 @@ textarea.invisible {
     outline: none;
     transition: 0.3s border;
     border-radius: 0.3em;
+    color: var(--color-fg);
+    &::placeholder {
+        color: var(--color-fg-2);
+    }
     &:hover,
     &:focus {
         border: 2px solid var(--color-primary);

@@ -164,6 +164,9 @@
         box-shadow: 0 0.2rem 2rem hsla(0, 0%, 0%, 0.3);
         width: 100%;
         white-space: pre-line;
+        & input {
+            color: inherit;
+        }
     }
     .company {
         display: flex;
