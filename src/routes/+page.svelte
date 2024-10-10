@@ -25,12 +25,14 @@
         <input id="password" name="password" type="password" autocomplete="current-password" />
         <button class="btn" type="submit" style:margin-top="0.5rem">Login</button>
     </form>
-    {#if form && form.status === 'invalid'}
-        Provide both email & password
-    {/if}
-    {#if form && form.status === 'login_failed'}
-        Login failed: {form.message}
-    {/if}
+    <div style:color="var(--color-error)">
+        {#if form && form.status === 'invalid'}
+            L'email & le mot de passe sont requis.
+        {/if}
+        {#if form && form.status === 'login_failed'}
+            La connexion a échouée ({form.message}).
+        {/if}
+    </div>
 </main>
 
 <style>
