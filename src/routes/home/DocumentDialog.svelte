@@ -1,5 +1,6 @@
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
+    import Trash from '$lib/icons/Trash.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {resize} from '$lib/helpers/resize';
     import {formatDate} from '$lib/helpers/formatDate';
@@ -56,12 +57,14 @@
         },
     });
     let newLine = $state<Line>({description: '', price: 0});
-    $effect(() => {
-        if (newLine.description.length && newLine.price > 0) {
-            invoice.lines.push({...newLine});
+    function addOrRemoveLine(line: Line, index: number) {
+        if (index === -1 && line.description.length > 0 && line.price > 0) {
+            invoice.lines.push({...line});
             newLine = {description: '', price: 0};
+        } else if (index !== -1 && line.description.length === 0 && !line.price) {
+            invoice.lines.splice(index, 1);
         }
-    });
+    }
 
     const aspectRatio = 595.28 / 841.89;
     let width = $state(0);
@@ -82,7 +85,7 @@
             <label for="quantityLabel" style:font-size="1rem">€ /</label>
             <input id="quantityLabel" style:width="5rem" type="text" placeholder="Jours" />
             <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Télécharger</a>
-            <button class="btn">Sauvegarder</button>
+            <button class="btn">Créer</button>
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
             {#if invoice.expand?.company_id}
@@ -116,18 +119,42 @@
                     <tbody>
                         {#each invoice.lines as line, i}
                             <tr>
-                                <td><input bind:value={line.description} type="text" class="invisible editable-description" placeholder="Description" /></td>
-                                <td><div class="editable-price"><input bind:value={line.price} type="number" class="invisible" placeholder="500" /> €</div> </td>
+                                <td
+                                    ><input
+                                        bind:value={line.description}
+                                        onchange={() => addOrRemoveLine(line, i)}
+                                        type="text"
+                                        class="invisible editable-description"
+                                        placeholder="Description"
+                                    /></td
+                                >
+                                <td
+                                    ><div class="editable-price">
+                                        <input bind:value={line.price} onchange={() => addOrRemoveLine(line, i)} type="number" class="invisible" placeholder="500" /> €
+                                    </div>
+                                </td>
                                 <td style:padding="0" style:border="none" style:width="{10 * ratio}px"
                                     ><button class="remove-line icon" style:color="var(--color-fg-1)" onclick={() => invoice.lines.splice(i, 1)}
-                                        ><Cross --size="{ratio * 12}px" /></button
+                                        ><Trash --size="{ratio * 12}px" /></button
                                     ></td
                                 >
                             </tr>
                         {/each}
                         <tr>
-                            <td><input bind:value={newLine.description} type="text" class="invisible editable-description" placeholder="Description" /></td>
-                            <td><div class="editable-price"><input bind:value={newLine.price} type="number" class="invisible" placeholder="500" /> €</div></td>
+                            <td
+                                ><input
+                                    bind:value={newLine.description}
+                                    onchange={() => addOrRemoveLine(newLine, -1)}
+                                    type="text"
+                                    class="invisible editable-description"
+                                    placeholder="Description"
+                                /></td
+                            >
+                            <td
+                                ><div class="editable-price">
+                                    <input bind:value={newLine.price} onchange={() => addOrRemoveLine(newLine, -1)} type="number" class="invisible" placeholder="500" /> €
+                                </div></td
+                            >
                         </tr>
                     </tbody>
                 </table>
