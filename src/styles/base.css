@@ -13,7 +13,7 @@ button.btn {
     justify-content: center;
 
     gap: 0.5em;
-    padding: 0.8em 1em;
+    padding: 0.5em 1em;
     font-size: var(--font-size, 0.9rem);
 
     cursor: pointer;
@@ -40,7 +40,7 @@ input[type='password']:not(.invisible),
 input[type='email']:not(.invisible),
 input[type='number']:not(.invisible),
 textarea:not(.invisible) {
-    padding: 0.8em;
+    padding: 0.5em;
     font-family: var(--font-brand);
     font-size: 0.9rem;
 }
@@ -59,7 +59,7 @@ select {
     cursor: pointer;
     border: none;
     outline: none;
-    padding: 0.8em 1em;
+    padding: 0.5em 1em;
     margin-bottom: 1rem;
 }
 
