@@ -1,15 +1,15 @@
 <script lang="ts">
-    import {formatDate} from '$lib/helpers/formatDate';
-    import type {Client, Company, Invoice} from '$lib/pocketbase/pocketbase';
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {resize} from '$lib/helpers/resize';
+    import {formatDate} from '$lib/helpers/formatDate';
+    import type {Line, Invoice} from '$lib/pocketbase/pocketbase';
 
     type Props = {
         isOpen: boolean;
     };
     let {isOpen = $bindable(false)}: Props = $props();
 
-    const invoice: Invoice = {
+    let invoice = $state<Invoice>({
         id: 'osef-invoice',
         client_id: 'osef-client',
         company_id: 'osef-company',
@@ -53,7 +53,14 @@
                 phone: '06 24 91 22 44',
             },
         },
-    };
+    });
+    let newLine = $state<Line>({description: '', price: 0});
+    $effect(() => {
+        if (newLine.description.length && newLine.price > 0) {
+            invoice.lines.push({...newLine});
+            newLine = {description: '', price: 0};
+        }
+    });
 
     const aspectRatio = 595.28 / 841.89;
     let width = $state(0);
@@ -80,7 +87,7 @@
             <input type="number" style:width="5rem" placeholder="600" />
             <label for="quantityLabel" style:font-size="1rem">€ /</label>
             <input id="quantityLabel" style:width="5rem" type="text" placeholder="Jours" />
-            <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Download PDF</a>
+            <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Téléchager</a>
             <button class="btn">Sauvegarder</button>
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
@@ -120,8 +127,8 @@
                             </tr>
                         {/each}
                         <tr>
-                            <td><input type="text" class="invisible editable-description" placeholder="Description" /></td>
-                            <td><div class="editable-price"><input type="number" class="invisible" placeholder="500" /> €</div></td>
+                            <td><input bind:value={newLine.description} type="text" class="invisible editable-description" placeholder="Description" /></td>
+                            <td><div class="editable-price"><input bind:value={newLine.price} type="number" class="invisible" placeholder="500" /> €</div></td>
                         </tr>
                     </tbody>
                 </table>
