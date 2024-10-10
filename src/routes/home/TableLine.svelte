@@ -27,7 +27,7 @@
 </script>
 
 <tr>
-    <td>{invoice.name} nº{invoice.number}</td>
+    <td class="name">{invoice.name} nº{invoice.number}</td>
     <td>{invoice.expand?.company_id.name}</td>
     <td style:color={statusMap[status].color} onclick={() => selectElement.click()}>
         {statusMap[status].name}
@@ -64,10 +64,19 @@
         opacity: 0;
     }
 
+    .name {
+        min-width: 12rem;
+    }
+
     .note {
-        max-width: 15rem;
-        text-overflow: ellipsis;
-        text-wrap: nowrap;
-        overflow: hidden;
+        & :global(p) {
+            text-wrap: wrap;
+            max-height: 10rem;
+            overflow: auto;
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            min-width: 10rem;
+        }
     }
 </style>

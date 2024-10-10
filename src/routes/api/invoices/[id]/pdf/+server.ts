@@ -11,7 +11,7 @@ const pageMargin = 50;
 const lineHeight = 20;
 
 export async function GET() {
-    const invoice = {
+    const invoice: Invoice = {
         id: 'osef-invoice',
         client_id: 'osef-client',
         company_id: 'osef-company',
@@ -55,7 +55,7 @@ export async function GET() {
                 phone: '06 24 91 22 44',
             },
         },
-    } as Invoice;
+    };
 
     const pdf = await PDFDocument.create();
     pdf.registerFontkit(fontkit);

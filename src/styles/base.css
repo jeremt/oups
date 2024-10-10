@@ -35,10 +35,24 @@ a[role='button'].icon {
     justify-content: center;
 }
 
-input[type='text'],
-input[type='password'],
-input[type='email'] {
+input[type='text']:not(.invisible),
+input[type='password']:not(.invisible),
+input[type='email']:not(.invisible),
+input[type='number']:not(.invisible),
+textarea:not(.invisible) {
     padding: 0.8em;
+    font-family: var(--font-brand);
+    font-size: 0.9rem;
+}
+
+input[type='text'].invisible,
+input[type='password'].invisible,
+input[type='email'].invisible,
+input[type='number'].invisible,
+textarea.invisible {
+    font-family: var(--font-brand);
+    background-color: none;
+    border: none;
 }
 
 select {

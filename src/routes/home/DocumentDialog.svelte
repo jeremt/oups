@@ -9,7 +9,7 @@
     };
     let {isOpen = $bindable(false)}: Props = $props();
 
-    const invoice = {
+    const invoice: Invoice = {
         id: 'osef-invoice',
         client_id: 'osef-client',
         company_id: 'osef-company',
@@ -53,7 +53,7 @@
                 phone: '06 24 91 22 44',
             },
         },
-    } as Invoice;
+    };
 
     const aspectRatio = 595.28 / 841.89;
     let width = $state(0);
@@ -77,6 +77,9 @@
                     />
                 </svg>
             </button>
+            <input type="number" style:width="5rem" placeholder="600" />
+            <label for="quantityLabel" style:font-size="1rem">€ /</label>
+            <input id="quantityLabel" style:width="5rem" type="text" placeholder="Jours" />
             <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Download PDF</a>
             <button class="btn">Sauvegarder</button>
         </header>
@@ -101,7 +104,7 @@
                 </div>
             {/if}
             <div class="infos">
-                <div class="title">Facture nº{invoice.number} : {invoice.name}</div>
+                <div class="title">Facture nº{invoice.number} : <input type="text" class="invisible" placeholder="Titre" value={invoice.name} /></div>
                 <table>
                     <thead>
                         <tr>
@@ -116,6 +119,10 @@
                                 <td>{price} €</td>
                             </tr>
                         {/each}
+                        <tr>
+                            <td><input type="text" class="invisible editable-description" placeholder="Description" /></td>
+                            <td><div class="editable-price"><input type="number" class="invisible" placeholder="500" /> €</div></td>
+                        </tr>
                     </tbody>
                 </table>
                 <div style:font-weight="bold" style:text-align="right" style:margin-top="{20 * ratio}px">
@@ -129,6 +136,8 @@
                 {/if}
             </div>
         </div>
+        <!-- /.invoice -->
+        <textarea style:margin-top="1rem" placeholder="Information supplémentaires sur la facture"></textarea>
     </div>
 </Dialog>
 
@@ -161,8 +170,11 @@
         flex-direction: column;
         width: fit-content;
         cursor: pointer;
+        transition: 0.3s outline;
+        border-radius: 0.3rem;
+        outline: 2px solid transparent;
         &:hover {
-            outline: 0.1rem solid var(--color-primary);
+            outline: 2px solid var(--color-primary);
         }
         & .name {
             font-weight: bold;
@@ -194,6 +206,14 @@
             font-size: calc(20px * var(--ratio));
             font-weight: bold;
             padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            & input[type='text'].invisible {
+                font-weight: inherit;
+                font-size: inherit;
+                flex-grow: 1;
+            }
         }
         & table {
             width: 100%;
@@ -209,5 +229,15 @@
     .payment-title {
         font-weight: bold;
         font-size: calc(14px * var(--ratio));
+    }
+    .editable-description {
+        width: 100%;
+    }
+    .editable-price {
+        display: flex;
+        align-items: center;
+        & input[type='number'] {
+            width: 3.5rem;
+        }
     }
 </style>

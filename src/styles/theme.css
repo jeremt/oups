@@ -90,12 +90,34 @@ button.btn > svg {
 
 /* Inputs */
 
-input[type='text'],
-input[type='password'],
-input[type='email'] {
+input[type='text']:not(.invisible),
+input[type='password']:not(.invisible),
+input[type='email']:not(.invisible),
+input[type='number']:not(.invisible),
+textarea:not(.invisible) {
     border: 2px solid var(--color-bg-2);
     border-radius: 0.5em;
     background-color: var(--color-bg-1);
+    outline: none;
+    transition: 0.3s border;
+    &:hover,
+    &:focus {
+        border: 2px solid var(--color-primary);
+    }
+}
+
+input[type='text'].invisible,
+input[type='password'].invisible,
+input[type='email'].invisible,
+input[type='number'].invisible,
+textarea.invisible {
+    font-family: var(--font-brand);
+    background-color: none;
+    border: 2px solid transparent;
+    outline: none;
+    transition: 0.3s border;
+    border-radius: 0.3em;
+    &:hover,
     &:focus {
         border: 2px solid var(--color-primary);
     }
