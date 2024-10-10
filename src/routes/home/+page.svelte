@@ -8,6 +8,19 @@
     let isDocumentOpen = $state(false);
 </script>
 
+<svelte:head>
+    <title>Oups</title>
+    <meta name="description" content="Gestionnaire de factures & devis pour éviter les erreurs 😅" />
+    <meta property="og:title" content="Oups" />
+    <meta property="og:site_name" content="Oups" />
+    <meta property="og:image" content="/thumbnail.png" />
+    <meta property="og:url" content="https://oups.vercel.app" />
+    <meta property="og:description" content="Gestionnaire de factures & devis pour éviter les erreurs 😅" />
+    <meta property="twitter:title" content="Oups" />
+    <meta property="twitter:description" content="Gestionnaire de factures & devis pour éviter les erreurs 😅" />
+    <meta property="twitter:image" content="/thumbnail.png" />
+</svelte:head>
+
 <main>
     <header>
         <div class="logo">Oups.</div>
