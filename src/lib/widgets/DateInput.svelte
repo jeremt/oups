@@ -1,6 +1,7 @@
 <script lang="ts">
-    type DateFormat = `${number}/${number}/${number}`;
-    let {date = $bindable()}: {date: DateFormat} = $props();
+    type Props = {date: string};
+
+    let {date = $bindable()}: Props = $props();
 
     const split = date.split('/');
     let day = $state<string>(split[0]);
@@ -39,19 +40,19 @@
             if (type === 'day') {
                 day = clampDay((parseInt(day) + 1).toString());
             } else if (type === 'month') {
-                month = clamp(parseInt(month) + 1, 1, 12).toString();
+                month = clampMonth((parseInt(month) + 1).toString());
             } else {
-                year = (parseInt(year) + 1).toString();
+                year = clampYear((parseInt(year) + 1).toString());
             }
             event.preventDefault();
             return;
         } else if (event.key === 'ArrowDown') {
             if (type === 'day') {
-                day = clampDay((parseInt(day ?? '0') - 1).toString());
+                day = clampDay((parseInt(day) - 1).toString());
             } else if (type === 'month') {
-                month = clamp(parseInt(month) - 1, 1, 12).toString();
+                month = clampMonth((parseInt(month) - 1).toString());
             } else {
-                year = (parseInt(year) - 1).toString();
+                year = clampYear((parseInt(year) - 1).toString());
             }
             event.preventDefault();
             return;
@@ -84,16 +85,16 @@
     }
 
     $effect(() => {
-        date = `${day ?? 1}/${month ?? 1}/${year ?? 1}` as DateFormat;
+        date = `${day ?? 1}/${month ?? 1}/${year ?? 1}`;
     });
 </script>
 
 <div>
-    <input type="text" value={day} onkeydown={event => onKeyDown(event, 'day')} oninput={e => (day = clampDay(e.currentTarget.value))} />
+    <input class="day" type="text" value={day} onkeydown={event => onKeyDown(event, 'day')} oninput={e => (day = clampDay(e.currentTarget.value))} />
     /
-    <input type="text" value={month} onkeydown={event => onKeyDown(event, 'month')} oninput={e => (month = clampMonth(e.currentTarget.value))} />
+    <input class="month" type="text" value={month} onkeydown={event => onKeyDown(event, 'month')} oninput={e => (month = clampMonth(e.currentTarget.value))} />
     /
-    <input type="text" value={year} onkeydown={event => onKeyDown(event, 'year')} oninput={e => (year = clampYear(e.currentTarget.value))} />
+    <input class="year" type="text" value={year} onkeydown={event => onKeyDown(event, 'year')} oninput={e => (year = clampYear(e.currentTarget.value))} />
 </div>
 
 <style>
@@ -101,19 +102,20 @@
         display: flex;
         align-items: center;
     }
+    .day {
+        margin-left: 0;
+    }
+    .year {
+        width: 2.25rem;
+    }
+
     input[type='text'] {
+        font-size: inherit;
         width: 1.25rem;
         padding: 0;
         border: none;
         background-color: transparent;
         border-radius: 0;
-        margin-left: 0.25rem;
-        &:first-of-type {
-            margin-left: 0;
-        }
-        &:last-of-type {
-            width: 2.25rem;
-        }
 
         &:focus,
         &:hover {

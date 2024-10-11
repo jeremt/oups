@@ -5,18 +5,20 @@
     import {resize} from '$lib/helpers/resize';
     import {formatDate} from '$lib/helpers/formatDate';
     import type {Line, Invoice} from '$lib/pocketbase/pocketbase';
+    import DateInput from '$lib/widgets/DateInput.svelte';
 
     type Props = {
         isOpen: boolean;
     };
     let {isOpen = $bindable(false)}: Props = $props();
 
+    let mode = $state<'add' | 'edit'>('add');
     let invoice = $state<Invoice>({
         id: 'osef-invoice',
         client_id: 'osef-client',
         company_id: 'osef-company',
         created: new Date().toString(),
-        emission_date: new Date().toString(),
+        emission_date: formatDate(new Date()),
         lines: [
             {price: 3200, description: 'Encadrement'},
             {price: 150, description: 'Réunions'},
@@ -73,6 +75,10 @@
     function onResize(w: number, h: number) {
         width = w;
     }
+
+    function add() {
+        console.log(invoice);
+    }
 </script>
 
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
@@ -85,7 +91,9 @@
             <label for="quantityLabel" style:font-size="1rem">€ /</label>
             <input id="quantityLabel" style:width="5rem" type="text" placeholder="Jours" />
             <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Télécharger</a>
-            <button class="btn">Créer</button>
+            {#if mode === 'add'}
+                <button class="btn" onclick={add}>Créer</button>
+            {/if}
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
             {#if invoice.expand?.company_id}
@@ -97,7 +105,7 @@
                     {#if company.email}<div class="email">{company.email}</div>{/if}
                     {#if company.siren}<div>SIREN : {company.siren}</div>{/if}
                 </div>
-                <div class="date">Date d'émission : {formatDate(new Date())}</div>
+                <div class="date">Date d'émission : <DateInput bind:date={invoice.emission_date} /></div>
             {/if}
             {#if invoice.expand?.client_id}
                 {@const client = invoice.expand.client_id}
@@ -230,8 +238,27 @@
         flex-direction: column;
         text-align: end;
         margin-top: auto;
+        border-radius: 0.3rem;
+        outline: 2px solid transparent;
+        cursor: pointer;
+        transition: 0.3s outline;
+        &:hover {
+            outline: 2px solid var(--color-primary);
+        }
         & .name {
             font-weight: bold;
+        }
+    }
+    .date {
+        display: flex;
+        gap: 0.2rem;
+
+        & :global(input.day),
+        & :global(input.month) {
+            width: calc(12px * var(--ratio));
+        }
+        & :global(input.year) {
+            width: calc(40px * var(--ratio));
         }
     }
     .infos {
