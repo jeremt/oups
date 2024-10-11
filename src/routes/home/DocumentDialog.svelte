@@ -6,12 +6,14 @@
     import {formatDate} from '$lib/helpers/formatDate';
     import type {Line, Invoice} from '$lib/pocketbase/pocketbase';
     import DateInput from '$lib/widgets/DateInput.svelte';
+    import ClientDialogPicker from './ClientDialogPicker.svelte';
 
     type Props = {
         isOpen: boolean;
     };
     let {isOpen = $bindable(false)}: Props = $props();
 
+    let isClientsOpen = $state(false);
     let mode = $state<'add' | 'edit'>('add');
     let invoice = $state<Invoice>({
         id: 'osef-invoice',
@@ -109,7 +111,17 @@
             {/if}
             {#if invoice.expand?.client_id}
                 {@const client = invoice.expand.client_id}
-                <div class="client">
+                <div
+                    class="client"
+                    onclick={() => (isClientsOpen = true)}
+                    role="button"
+                    tabindex="0"
+                    onkeydown={e => {
+                        if (e.key === 'Enter') {
+                            isClientsOpen = true;
+                        }
+                    }}
+                >
                     {#if client.name}<div class="name">{client.name}</div>{/if}
                     {#if client.email}<div>{client.email}</div>{/if}
                     {#if client.address}<div>{client.address}</div>{/if}
@@ -181,6 +193,7 @@
         <textarea style:margin-top="1rem" placeholder="Information supplémentaires sur la facture"></textarea>
     </div>
 </Dialog>
+<ClientDialogPicker isOpen={isClientsOpen} />
 
 <style>
     .editor {
