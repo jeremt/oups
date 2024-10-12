@@ -14,4 +14,9 @@ module.exports = {
     preDeleteOutputFolder: true,
     outputPath: './src/lib/kysely/gen',
     preRenderHooks: [makeKyselyHook()],
+    customTypeMap: {
+        'pg_catalog.tsvector': 'Set<string>',
+        'pg_catalog.int8': 'number',
+        'pg_catalog.bytea': 'string',
+    },
 };
