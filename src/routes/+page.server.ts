@@ -10,10 +10,9 @@ export const actions = {
             return fail(400, {email, status: 'invalid', message: ''});
         }
 
-        try {
-            await locals.pb.collection('users').authWithPassword(email, password);
-        } catch (e: unknown) {
-            return fail(403, {email, status: 'login_failed', message: (e as object).toString()});
+        const {error} = await locals.supabase.auth.signInWithPassword({email, password});
+        if (error) {
+            return fail(403, {email, status: 'login_failed', message: error?.message});
         }
 
         throw redirect(302, '/home');
