@@ -1,15 +1,17 @@
 import {error, json} from '@sveltejs/kit';
 import {verifyAddClient} from './schema.js';
-import type {Client} from '$lib/pocketbase/pocketbase.js';
+import {kysely} from '$lib/kysely/kysely.js';
+import type {NewClients} from '$lib/kysely/gen/public/Clients.js';
 
-export async function GET({locals}) {
-    return json(await locals.pbAdmin.collection('clients').getFullList());
+export async function GET() {
+    const clients = await kysely.selectFrom('clients').selectAll().execute();
+    return json(clients);
 }
 
-export async function POST({request, locals}) {
-    const data = (await request.json()) as Omit<Client, 'id' | 'created' | 'updated'>;
+export async function POST({request}) {
+    const data = (await request.json()) as NewClients;
     if (!verifyAddClient(data)) {
         throw error(400, verifyAddClient.errors?.join('  '));
     }
-    return json(await locals.pbAdmin.collection('clients').create(data));
+    return json(await kysely.insertInto('clients').values(data).returningAll().executeTakeFirst());
 }

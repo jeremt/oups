@@ -3,10 +3,12 @@
     import Trash from '$lib/icons/Trash.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {resize} from '$lib/helpers/resize';
-    import {formatDate} from '$lib/helpers/formatDate';
-    import type {Line, Invoice} from '$lib/pocketbase/pocketbase';
     import DateInput from '$lib/widgets/DateInput.svelte';
     import ClientDialogPicker from './ClientDialogPicker.svelte';
+    import type {DocumentLine} from '$lib/supabase/types';
+    import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
+    import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
+    import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
 
     type Props = {
         isOpen: boolean;
@@ -15,12 +17,14 @@
 
     let isClientsOpen = $state(false);
     let mode = $state<'add' | 'edit'>('add');
-    let invoice = $state<Invoice>({
-        id: 'osef-invoice',
-        client_id: 'osef-client',
-        company_id: 'osef-company',
-        created: new Date().toString(),
-        emission_date: formatDate(new Date()),
+    let invoice = $state<Omit<Documents, 'emitted_at'> & {company: Companies; client: Clients; emitted_at: string}>({
+        id: 1 as DocumentsId,
+        client_id: 1 as ClientsId,
+        organization_id: null,
+        company_id: 1 as CompaniesId,
+        created_at: new Date(),
+        updated_at: new Date(),
+        emitted_at: new Date().toISOString(),
         lines: [
             {price: 3200, description: 'Encadrement'},
             {price: 150, description: 'Réunions'},
@@ -37,36 +41,42 @@
         name: 'Encadrement',
         number: 15,
         status: 'generated',
-        expand: {
-            client_id: {
-                id: 'osef-client',
-                created: new Date().toString(),
-                name: 'Ada Tech School',
-                address: '28 rue du Petit Musc\n75004 Paris',
-                company_id: 'osef-company',
-            },
-            company_id: {
-                id: 'osef-company',
-                current_invoice_number: 14,
-                current_quote_number: 1,
-                created: new Date().toString(),
-                name: 'M JÉRÉMIE TABOADA ALVAREZ',
-                address: '11 rue de Pommard\n75012 Paris',
-                bic: 'AGRIFRPP882',
-                iban: 'FR76 1820 6000 5165 0085 3209 021',
-                siren: '853 291 268',
-                email: 'taboada.jeremie@gmail.com',
-                phone: '06 24 91 22 44',
-            },
+        note: '',
+        type: 'invoice',
+        quantity_base: 600,
+        quantity_label: 'jour',
+        client: {
+            id: 1 as ClientsId,
+            created_at: new Date(),
+            name: 'Ada Tech School',
+            address: '28 rue du Petit Musc\n75004 Paris',
+            updated_at: new Date(),
+            logo_url: null,
+            email: null,
+        },
+        company: {
+            id: 1 as CompaniesId,
+            quote_sequence: 14,
+            invoice_sequence: 1,
+            created_at: new Date(),
+            updated_at: new Date(),
+            name: 'M JÉRÉMIE TABOADA ALVAREZ',
+            address: '11 rue de Pommard\n75012 Paris',
+            bic: 'AGRIFRPP882',
+            iban: 'FR76 1820 6000 5165 0085 3209 021',
+            siren: '853 291 268',
+            email: 'taboada.jeremie@gmail.com',
+            phone: '06 24 91 22 44',
+            logo_url: null,
         },
     });
-    let newLine = $state<Line>({description: '', price: 0});
-    function addOrRemoveLine(line: Line, index: number) {
+    let newLine = $state<DocumentLine>({description: '', price: 0});
+    function addOrRemoveLine(line: DocumentLine, index: number) {
         if (index === -1 && line.description.length > 0 && line.price > 0) {
-            invoice.lines.push({...line});
+            (invoice.lines as DocumentLine[]).push({...line});
             newLine = {description: '', price: 0};
         } else if (index !== -1 && line.description.length === 0 && !line.price) {
-            invoice.lines.splice(index, 1);
+            (invoice.lines as DocumentLine[]).splice(index, 1);
         }
     }
 
@@ -98,8 +108,8 @@
             {/if}
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
-            {#if invoice.expand?.company_id}
-                {@const company = invoice.expand.company_id}
+            {#if invoice.company}
+                {@const company = invoice.company}
                 <div class="company">
                     {#if company.name}<div class="name">{company.name}</div>{/if}
                     {#if company.address}<div class="address">{company.address}</div>{/if}
@@ -107,10 +117,10 @@
                     {#if company.email}<div class="email">{company.email}</div>{/if}
                     {#if company.siren}<div>SIREN : {company.siren}</div>{/if}
                 </div>
-                <div class="date">Date d'émission : <DateInput bind:date={invoice.emission_date} /></div>
+                <div class="date">Date d'émission : <DateInput bind:date={invoice.emitted_at} /></div>
             {/if}
-            {#if invoice.expand?.client_id}
-                {@const client = invoice.expand.client_id}
+            {#if invoice.client_id}
+                {@const client = invoice.client}
                 <div
                     class="client"
                     onclick={() => (isClientsOpen = true)}
@@ -137,7 +147,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#each invoice.lines as line, i}
+                        {#each invoice.lines as DocumentLine[] as line, i}
                             <tr>
                                 <td
                                     ><input
@@ -154,7 +164,7 @@
                                     </div>
                                 </td>
                                 <td style:padding="0" style:border="none" style:width="{10 * ratio}px"
-                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => invoice.lines.splice(i, 1)}
+                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => (invoice.lines as DocumentLine[]).splice(i, 1)}
                                         ><Trash --size="{ratio * 12}px" /></button
                                     ></td
                                 >
@@ -179,11 +189,11 @@
                     </tbody>
                 </table>
                 <div style:font-weight="bold" style:text-align="right" style:margin-top="{20 * ratio}px">
-                    Total (HT) : {invoice.lines.reduce((total, line) => total + line.price, 0)} €
+                    Total (HT) : {(invoice.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €
                 </div>
                 <div style:text-align="right">TVA Non applicable</div>
-                {#if invoice.expand?.company_id}
-                    {@const company = invoice.expand.company_id}
+                {#if invoice.company_id}
+                    {@const company = invoice.company}
                     <div class="payment-title">Informations de paiement</div>
                     <div class="payment-infos">BIC : {company.bic}<br />IBAN : {company.iban}</div>
                 {/if}
@@ -268,7 +278,7 @@
 
         & :global(input.day),
         & :global(input.month) {
-            width: calc(12px * var(--ratio));
+            width: calc(16px * var(--ratio));
         }
         & :global(input.year) {
             width: calc(40px * var(--ratio));

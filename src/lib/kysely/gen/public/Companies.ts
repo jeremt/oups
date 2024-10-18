@@ -4,7 +4,7 @@
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 /** Identifier type for public.companies */
-export type CompaniesId = string & { __brand: 'CompaniesId' };
+export type CompaniesId = number & { __brand: 'CompaniesId' };
 
 /** Represents the table public.companies */
 export default interface CompaniesTable {
@@ -26,9 +26,13 @@ export default interface CompaniesTable {
 
   siren: ColumnType<string, string, string>;
 
-  quote_sequence: ColumnType<string, string | undefined, string>;
+  email: ColumnType<string, string, string>;
 
-  invoice_sequence: ColumnType<string, string | undefined, string>;
+  phone: ColumnType<string | null, string | null, string | null>;
+
+  quote_sequence: ColumnType<number, number | undefined, number>;
+
+  invoice_sequence: ColumnType<number, number | undefined, number>;
 }
 
 export type Companies = Selectable<CompaniesTable>;

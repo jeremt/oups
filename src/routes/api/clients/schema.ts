@@ -9,7 +9,7 @@ export const verifyAddClient = ajv.compile({
         name: {type: 'string'},
         address: {type: 'string'},
         email: {type: 'string'},
-        company_id: {type: 'string'},
+        company_id: {type: 'number'},
     },
     required: ['name', 'address', 'company_id'],
 });
@@ -22,6 +22,6 @@ export const verifyUpdateClient = ajv.compile({
         name: {type: 'string'},
         address: {type: 'string'},
         email: {type: 'string'},
-        company_id: {type: 'string'},
+        company_id: {type: 'number'},
     },
 });

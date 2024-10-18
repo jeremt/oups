@@ -1,13 +1,13 @@
 export function inputDebounce(el: HTMLInputElement | HTMLTextAreaElement, params: [number, (value: string) => void]) {
     const [delay, onUpdate] = params;
-    let timeout: number;
+    let timeout: NodeJS.Timeout | undefined;
 
     const listener = (event: Event) => {
         if (timeout) {
             clearTimeout(timeout);
         }
         timeout = setTimeout(() => {
-            timeout = 0;
+            timeout = undefined;
             onUpdate((event.target as HTMLInputElement).value);
         }, delay);
     };

@@ -30,7 +30,7 @@ export const verifyAddInvoice = ajv.compile({
         company_id: {
             type: 'string',
         },
-        emission_date: {
+        emitted_at: {
             type: 'string',
         },
         lines: linesSchema,

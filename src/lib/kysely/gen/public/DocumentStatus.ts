@@ -7,7 +7,7 @@ type DocumentStatus =
   | 'sent'
   | 'accepted'
   | 'declined'
-  | 'payed'
+  | 'paid'
   | 'declared';
 
 export default DocumentStatus;

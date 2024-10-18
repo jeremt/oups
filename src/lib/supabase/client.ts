@@ -1,9 +1,10 @@
 import {createClient, type Session, type User as SupabaseUser} from '@supabase/supabase-js';
 import {type Cookies} from '@sveltejs/kit';
-import type {User} from './user';
+import type {ConnectedUser, User} from './user';
 import {SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL} from '$env/static/private';
 import {combineChunk, createChunks, destroyChunks} from './cookieChunker';
 import {kysely} from '$lib/kysely/kysely';
+import { Companies } from '$lib/kysely/gen/public/Companies';
 
 const adminEmails = ['20cent.neel@gmail.com', 'taboada.jeremie@gmail.com', 'jonathan.picques@gmail.com'];
 
@@ -72,8 +73,8 @@ export function createServerClient(storageKey: string, cookies: Cookies) {
 
             // No anonId, so we just create one
             if (anonId === undefined) {
-                const anonUser = await kysely.insertInto('users').returning('id').executeTakeFirstOrThrow();
-                cookies.set('anon_id', anonUser.id, {
+                const anonUser = await kysely.insertInto('users').defaultValues().returning('id').executeTakeFirstOrThrow();
+                cookies.set('anon_id', anonUser.id.toString(), {
                     path: '/',
                     maxAge: 60 * 60 * 24 * 30, // one month
                     secure: process.env.NODE_ENV === 'production',
@@ -86,8 +87,8 @@ export function createServerClient(storageKey: string, cookies: Cookies) {
                 const anonUser = await kysely.selectFrom('users').select('id').executeTakeFirst();
                 // if the cookie has been tampered with (anonUser does not exist), we still have to create one
                 if (!anonUser) {
-                    const anonUser = await kysely.insertInto('users').returning('id').executeTakeFirstOrThrow();
-                    cookies.set('anon_id', anonUser.id, {
+                    const anonUser = await kysely.insertInto('users').defaultValues().returning('id').executeTakeFirstOrThrow();
+                    cookies.set('anon_id', anonUser.id.toString(), {
                         path: '/',
                         maxAge: 60 * 60 * 24 * 30, // one month
                         secure: process.env.NODE_ENV === 'production',
@@ -107,13 +108,33 @@ export function createServerClient(storageKey: string, cookies: Cookies) {
  * Fetch all additional info to create the user from the
  * supabase user.
  */
-async function buildUser(supabaseUser: SupabaseUser): Promise<User> {
+async function buildUser(supabaseUser: SupabaseUser): Promise<ConnectedUser> {
+    const {userId,companyId, ...userCompany} = await kysely
+        .selectFrom('users')
+        .leftJoin('companies', 'companies.id', 'users.company_id')
+        .select([
+            'users.id as userId',
+            'companies.id as companyId',
+            'companies.address',
+            'companies.bic',
+            'companies.created_at',
+            'companies.iban',
+            'companies.invoice_sequence',
+            'companies.logo_url',
+            'companies.name',
+            'companies.quote_sequence',
+            'companies.siren',
+            'companies.updated_at',
+        ])
+        .where('users.user_id', '=', supabaseUser.id)
+        .executeTakeFirstOrThrow();
     return {
-        id: supabaseUser.id,
+        id: userId as number,
         name: supabaseUser.user_metadata.name,
         type: 'connected',
         admin: adminEmails.includes(supabaseUser.email!) ? true : undefined,
         email: supabaseUser.email!,
+        company: companyId ? {id:companyId, ...userCompany} as Companies : undefined,
         avatar_url: supabaseUser.user_metadata.avatar_url ?? '',
     };
 }

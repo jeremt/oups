@@ -2,21 +2,26 @@ import {read} from '$app/server';
 import fontkit from '@pdf-lib/fontkit';
 import {formatDate} from '$lib/helpers/formatDate';
 import {grayscale, PDFDocument, PDFFont} from 'pdf-lib';
-import type {Invoice} from '$lib/pocketbase/pocketbase';
+import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
+import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
+import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
 
 import BricolageGrotesque from './fonts/BricolageGrotesque-Regular.ttf';
 import BricolageGrotesqueBold from './fonts/BricolageGrotesque-Bold.ttf';
+import {DocumentLine} from '$lib/supabase/types';
 
 const pageMargin = 50;
 const lineHeight = 20;
 
 export async function GET() {
-    const invoice: Invoice = {
-        id: 'osef-invoice',
-        client_id: 'osef-client',
-        company_id: 'osef-company',
-        created: new Date().toString(),
-        emission_date: new Date().toString(),
+    const invoice: Documents & {company: Companies; client: Clients} = {
+        id: 1 as DocumentsId,
+        client_id: 1 as ClientsId,
+        organization_id: null,
+        company_id: 1 as CompaniesId,
+        created_at: new Date(),
+        updated_at: new Date(),
+        emitted_at: new Date(),
         lines: [
             {price: 3200, description: 'Encadrement'},
             {price: 150, description: 'Réunions'},
@@ -33,27 +38,33 @@ export async function GET() {
         name: 'Encadrement',
         number: 15,
         status: 'generated',
-        expand: {
-            client_id: {
-                id: 'osef-client',
-                created: new Date().toString(),
-                name: 'Ada Tech School',
-                address: '28 rue du Petit Musc\n75004 Paris',
-                company_id: 'osef-company',
-            },
-            company_id: {
-                id: 'osef-company',
-                current_invoice_number: 14,
-                current_quote_number: 1,
-                created: new Date().toString(),
-                name: 'M JÉRÉMIE TABOADA ALVAREZ',
-                address: '11 rue de Pommard\n75012 Paris',
-                bic: 'AGRIFRPP882',
-                iban: 'FR76 1820 6000 5165 0085 3209 021',
-                siren: '853 291 268',
-                email: 'taboada.jeremie@gmail.com',
-                phone: '06 24 91 22 44',
-            },
+        note: '',
+        type: 'invoice',
+        quantity_base: 600,
+        quantity_label: 'jour',
+        client: {
+            id: 1 as ClientsId,
+            created_at: new Date(),
+            name: 'Ada Tech School',
+            address: '28 rue du Petit Musc\n75004 Paris',
+            updated_at: new Date(),
+            logo_url: null,
+            email: null,
+        },
+        company: {
+            id: 1 as CompaniesId,
+            quote_sequence: 14,
+            invoice_sequence: 1,
+            created_at: new Date(),
+            updated_at: new Date(),
+            name: 'M JÉRÉMIE TABOADA ALVAREZ',
+            address: '11 rue de Pommard\n75012 Paris',
+            bic: 'AGRIFRPP882',
+            iban: 'FR76 1820 6000 5165 0085 3209 021',
+            siren: '853 291 268',
+            email: 'taboada.jeremie@gmail.com',
+            phone: '06 24 91 22 44',
+            logo_url: null,
         },
     };
 
@@ -66,7 +77,7 @@ export async function GET() {
     const page = pdf.addPage();
 
     // company
-    const company = invoice.expand!.company_id;
+    const company = invoice.company;
     page.moveTo(pageMargin, page.getHeight() - pageMargin);
     page.drawText(company.name, {font: fontBold, size: 12});
     page.moveDown(lineHeight);
@@ -86,10 +97,10 @@ export async function GET() {
     page.moveDown(lineHeight / 2);
     page.drawText(`SIREN : ${company.siren}`, {font, size: 12});
     page.moveDown(lineHeight);
-    page.drawText(`Date d'émission : ${formatDate(new Date(invoice.emission_date))}`, {font, size: 12});
+    page.drawText(`Date d'émission : ${formatDate(invoice.emitted_at)}`, {font, size: 12});
 
     // client
-    const client = invoice.expand!.client_id;
+    const client = invoice.client;
 
     page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(client.name, 12) - pageMargin, page.getHeight() - 150);
     page.drawText(client.name, {font: fontBold, size: 12});
@@ -139,7 +150,7 @@ export async function GET() {
     });
 
     y -= rowHeight;
-    for (const {price, description} of invoice.lines) {
+    for (const {price, description} of invoice.lines as DocumentLine[]) {
         const lineCount = description.split('\n').length;
         page.drawRectangle({
             x: pageMargin,
@@ -175,7 +186,7 @@ export async function GET() {
         y -= rowHeight * lineCount;
     }
 
-    const totalText = `Total (HT) : ${invoice.lines.reduce((total, line) => total + line.price, 0)} €`;
+    const totalText = `Total (HT) : ${(invoice.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €`;
     page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(totalText, 12) - pageMargin, y);
     page.drawText(totalText, {font: fontBold, size: 12});
     page.moveTo(page.getWidth() - font.widthOfTextAtSize('TVA Non applicable', 12) - pageMargin, y - lineHeight);

@@ -1,20 +1,22 @@
 import {browser} from '$app/environment';
+import { Companies } from '$lib/kysely/gen/public/Companies';
 import {getContext, setContext} from 'svelte';
 
 export interface ConnectedUser {
     type: 'connected';
     //
-    id: string;
+    id: number;
     name: string;
     email: string;
     admin?: boolean;
+    company?: Companies;
     avatar_url: string;
 }
 
 interface AnonUser {
     type: 'anon';
     //
-    id: string;
+    id: number;
 }
 
 export type User = ConnectedUser | AnonUser;
@@ -38,10 +40,10 @@ class UserContext {
 
     constructor() {
         /**
-         * We use a specific USER_LOADING value of id to prevent fouc by
+         * We use a specific id (-1) to prevent fouc by
          * checking if the user has been loaded from local storage already.
          */
-        let initialUser: User = {type: 'anon', id: 'USER_LOADING'};
+        let initialUser: User = {type: 'anon', id: -1};
 
         if (browser) {
             const cachedUser = localStorage.getItem('user');

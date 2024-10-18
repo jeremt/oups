@@ -3,10 +3,18 @@
 
     let {date = $bindable()}: Props = $props();
 
-    const split = date.split('/');
+    const split = splitDate(date);
     let day = $state<string>(split[0]);
     let month = $state<string>(split[1]);
     let year = $state<string>(split[2]);
+
+    function splitDate(date: string) {
+        const d = new Date(date);
+        if (isNaN(d.getDate())) {
+            return date.split('/');
+        }
+        return `${d.getDate()}/${clampMonth(d.getUTCMonth().toString())}/${clampYear(d.getFullYear().toString())}`.split('/');
+    }
 
     function clamp(value: number, min: number, max: number) {
         if (isNaN(value) || value < min) {

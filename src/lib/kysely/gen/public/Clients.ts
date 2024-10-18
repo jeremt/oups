@@ -4,7 +4,7 @@
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 /** Identifier type for public.clients */
-export type ClientsId = string & { __brand: 'ClientsId' };
+export type ClientsId = number & { __brand: 'ClientsId' };
 
 /** Represents the table public.clients */
 export default interface ClientsTable {
