@@ -5,8 +5,6 @@
 
     let {data} = $props();
 
-    console.log(typeof data.companies[0].created_at);
-
     let isDocumentOpen = $state(false);
 </script>
 

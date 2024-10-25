@@ -96,7 +96,7 @@
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
     <div class="editor">
         <header>
-            <button aria-label="Back" class="icon" onclick={() => (isOpen = false)}>
+            <button aria-label="Retour" class="icon" onclick={() => (isOpen = false)}>
                 <Cross />
             </button>
             <input type="number" style:width="5rem" placeholder="600" />
