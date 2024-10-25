@@ -1,7 +1,11 @@
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
     import type {Clients} from '$lib/kysely/gen/public/Clients';
+    import type {Companies} from '$lib/kysely/gen/public/Companies';
     import Dialog from '$lib/widgets/Dialog.svelte';
+    import ResizeInput from '$lib/widgets/ResizeInput.svelte';
+    import EnhancedSelect, {type Option} from '$lib/widgets/EnhancedSelect.svelte';
+    import {onMount} from 'svelte';
 
     type Props = {
         isOpen: boolean;
@@ -9,6 +13,9 @@
     };
 
     let {isOpen = $bindable(false), selectedClient = $bindable(undefined)}: Props = $props();
+    let error = $state('');
+    let companyIdSelected = $state<number>();
+    let options = $state<Option[]>([]);
 
     let client = $derived(
         selectedClient ?? {
@@ -19,12 +26,45 @@
         },
     );
 
-    function createClient() {
-        //
+    async function createClient() {
+        console.log(companyIdSelected);
+        const response = await fetch(`/api/clients`, {
+            method: 'POST',
+            body: JSON.stringify({
+                ...client,
+                company_id: companyIdSelected,
+            }),
+        });
+        if (response.status === 200) {
+            isOpen = false;
+        } else {
+            error = (await response.json())?.message;
+        }
     }
-    function editClient() {
-        //
+    async function editClient() {
+        const response = await fetch(`/api/clients/${selectedClient!.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                ...client,
+                company_id: companyIdSelected,
+            }),
+        });
+        if (response.status === 200) {
+            isOpen = false;
+        } else {
+            error = (await response.json())?.message;
+        }
     }
+
+    onMount(async () => {
+        const response = await fetch(`/api/companies`);
+        if (response.status === 200) {
+            const companies: Companies[] = await response.json();
+            options = companies.map(c => ({id: c.id as number, image: c.logo_url ?? '', label: c.name}));
+        } else {
+            error = (await response.json())?.message;
+        }
+    });
 </script>
 
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
@@ -41,11 +81,17 @@
         {/if}
     </header>
     <div class="form">
-        <input type="text" placeholder="Nom du client" bind:value={client.name} />
-        <input type="text" placeholder="Adresse" bind:value={client.address} />
-        <input type="email" placeholder="Adresse email" bind:value={client.email} />
-        <input type="text" placeholder="URL du logo" bind:value={client.logo_url} />
+        <ResizeInput placeholder="Nom du client" bind:value={client.name}></ResizeInput>
+        <ResizeInput placeholder="Adresse" bind:value={client.address}></ResizeInput>
+        <ResizeInput placeholder="Adresse email" bind:value={client.email}></ResizeInput>
+        <ResizeInput placeholder="URL du logo" bind:value={client.logo_url}></ResizeInput>
+        <EnhancedSelect bind:value={companyIdSelected} {options} placeholder="Entreprise" />
     </div>
+    {#if error}
+        <div class="error">
+            {error}
+        </div>
+    {/if}
 </Dialog>
 
 <style>
@@ -64,5 +110,10 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
+    }
+
+    .error {
+        color: var(--color-error);
+        white-space: pre-line;
     }
 </style>

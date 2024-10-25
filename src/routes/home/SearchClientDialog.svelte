@@ -5,11 +5,12 @@
     import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
     import Pen from '$lib/icons/Pen.svelte';
     import CreateEditClientDialog from './CreateEditClientDialog.svelte';
+    import {onMount} from 'svelte';
 
     type Props = {isOpen: boolean; onSelect: (client: Clients) => void};
     let {isOpen = $bindable(false), onSelect}: Props = $props();
 
-    const clients: Clients[] = [
+    let clients: Clients[] = $state([
         {
             id: 0 as ClientsId,
             created_at: new Date(),
@@ -28,7 +29,7 @@
             email: 'pie.lacombe@gmail.com',
             logo_url: null,
         },
-    ];
+    ]);
 
     let query = $state('');
     let selectedClient = $state<Clients | undefined>(undefined);
@@ -36,6 +37,15 @@
     let isCreateOrEditOpen = $state(false);
 
     function handleSearch() {}
+
+    onMount(async () => {
+        const response = await fetch(`/api/clients`, {
+            method: 'GET',
+        });
+        if (response.status === 200) {
+            clients = await response.json();
+        }
+    });
 </script>
 
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>

@@ -8,12 +8,13 @@ export async function PATCH({params, request}) {
 
     const data = (await request.json()) as ClientsUpdate;
     if (!verifyUpdateClient(data)) {
-        return error(400, verifyUpdateClient.errors?.join('  '));
+        return error(400, verifyUpdateClient.errors?.map(e => e.message).join('\n'));
     }
     const client = await kysely
         .updateTable('clients')
         .set(data)
         .where('id', '=', id as ClientsId)
+        .returningAll()
         .executeTakeFirstOrThrow();
 
     return json(client);

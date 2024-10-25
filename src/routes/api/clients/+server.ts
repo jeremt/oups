@@ -11,7 +11,7 @@ export async function GET() {
 export async function POST({request}) {
     const data = (await request.json()) as NewClients;
     if (!verifyAddClient(data)) {
-        throw error(400, verifyAddClient.errors?.join('  '));
+        throw error(400, verifyAddClient.errors?.map(e => e.message).join('\n'));
     }
     return json(await kysely.insertInto('clients').values(data).returningAll().executeTakeFirst());
 }

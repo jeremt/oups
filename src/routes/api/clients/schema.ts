@@ -24,4 +24,5 @@ export const verifyUpdateClient = ajv.compile({
         email: {type: 'string'},
         company_id: {type: 'number'},
     },
+    required: ['name', 'address', 'company_id'],
 });
