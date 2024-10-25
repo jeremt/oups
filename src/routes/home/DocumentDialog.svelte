@@ -4,7 +4,7 @@
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {resize} from '$lib/helpers/resize';
     import DateInput from '$lib/widgets/DateInput.svelte';
-    import ClientDialogPicker from './ClientDialogPicker.svelte';
+    import SearchClientDialog from './SearchClientDialog.svelte';
     import type {DocumentLine} from '$lib/supabase/types';
     import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
     import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
@@ -203,7 +203,7 @@
         <textarea style:margin-top="1rem" placeholder="Information supplémentaires sur la facture"></textarea>
     </div>
 </Dialog>
-<ClientDialogPicker isOpen={isClientsOpen} />
+<SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (invoice.client = client)} />
 
 <style>
     .editor {

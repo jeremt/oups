@@ -4,11 +4,10 @@
     import {inputDebounce} from '$lib/helpers/inputDebounce';
     import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
     import Pen from '$lib/icons/Pen.svelte';
+    import CreateEditClientDialog from './CreateEditClientDialog.svelte';
 
-    type Props = {isOpen: boolean};
-
-    let {isOpen = $bindable(false)}: Props = $props();
-    let query = $state('');
+    type Props = {isOpen: boolean; onSelect: (client: Clients) => void};
+    let {isOpen = $bindable(false), onSelect}: Props = $props();
 
     const clients: Clients[] = [
         {
@@ -25,11 +24,16 @@
             created_at: new Date(),
             updated_at: new Date(),
             name: 'Pierre Lacombe',
-            address: '44 rue des navettes spaciales, 123456 Kourou, Guyanne.',
+            address: '44 rue des navettes, 123456 Kourou, Guyanne.',
             email: 'pie.lacombe@gmail.com',
             logo_url: null,
         },
     ];
+
+    let query = $state('');
+    let selectedClient = $state<Clients | undefined>(undefined);
+
+    let isCreateOrEditOpen = $state(false);
 
     function handleSearch() {}
 </script>
@@ -40,7 +44,13 @@
             <Cross />
         </button>
         <input bind:value={query} type="text" placeholder="Rechercher un client..." use:inputDebounce={[300, handleSearch]} />
-        <button class="btn">Ajouter</button>
+        <button
+            class="btn"
+            onclick={() => {
+                selectedClient = undefined;
+                isCreateOrEditOpen = true;
+            }}>Ajouter</button
+        >
     </header>
     <div class="clients">
         {#each clients as client}
@@ -50,7 +60,8 @@
             <div
                 class="card"
                 onclick={e => {
-                    console.log('select client');
+                    onSelect(client);
+                    isOpen = false;
                 }}
             >
                 <div class="top">
@@ -60,7 +71,8 @@
                         class="icon"
                         onclick={e => {
                             e.stopPropagation();
-                            console.log('edit client');
+                            selectedClient = client;
+                            isCreateOrEditOpen = true;
                         }}><Pen /></button
                     >
                 </div>
@@ -70,6 +82,8 @@
         {/each}
     </div>
 </Dialog>
+
+<CreateEditClientDialog bind:isOpen={isCreateOrEditOpen} {selectedClient} />
 
 <style>
     header {
@@ -92,15 +106,17 @@
             padding: 1rem;
             border: 2px solid var(--color-bg-2);
             border-radius: 0.5rem;
-            gap: 0.5rem;
             &:hover {
                 border: 2px solid var(--color-primary);
             }
+            font-size: 0.9rem;
+            color: var(--color-fg-1);
             & .top {
                 display: flex;
             }
             & .name {
-                font-size: 1.2rem;
+                color: var(--color-fg);
+                font-size: 1.1rem;
                 font-weight: bold;
                 flex-grow: 1;
             }
