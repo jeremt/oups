@@ -29,10 +29,14 @@
 </script>
 
 <div class="custom-select">
-    <button type="button" class="btn" onclick={toggleDropdown} aria-haspopup="listbox" aria-expanded={isOpen}>
+    <button class="btn" onclick={toggleDropdown} aria-haspopup="listbox" aria-expanded={isOpen}>
         {#if optionSelected}
             <div class="selected-option">
-                <img src={optionSelected.image} alt="" class="option-image" />
+                {#if optionSelected.image}
+                    <img src={optionSelected.image} alt="" class="option-image" />
+                {:else}
+                    <span class="option-image"></span>
+                {/if}
                 <span>{optionSelected.label}</span>
             </div>
         {:else}
@@ -42,13 +46,16 @@
             <path d="M7 10l5 5 5-5z" />
         </svg>
     </button>
-
     {#if isOpen}
         <ul class="options-list" role="listbox" tabindex="-1">
             {#each options as option (option.id)}
                 <li role="option" aria-selected={value === option.id}>
                     <button onclick={() => handleSelect(option)} class="option-item">
-                        <img src={option.image} alt="" class="option-image" />
+                        {#if option.image}
+                            <img src={option.image} alt="" class="option-image" />
+                        {:else}
+                            <span class="option-image"></span>
+                        {/if}
                         <span>{option.label}</span>
                     </button>
                 </li>
@@ -124,10 +131,10 @@
     }
 
     .option-item:hover {
-        background-color: var(--color-fg-2);
+        background-color: var(--color-bg-2);
     }
 
     li[aria-selected='true'] {
-        background-color: var(--color-fg-2);
+        background-color: var(--color-bg-2);
     }
 </style>

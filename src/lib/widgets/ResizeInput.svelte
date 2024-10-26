@@ -6,7 +6,6 @@
 
     let {value = $bindable(''), oninput, ...rest}: Props = $props();
 
-    let computedStyle = $state<CSSStyleDeclaration>();
     let textarea: HTMLTextAreaElement;
 
     function resize() {
@@ -24,7 +23,7 @@
     }
 
     onMount(() => {
-        computedStyle = window.getComputedStyle(textarea);
+        resize();
     });
 </script>
 
