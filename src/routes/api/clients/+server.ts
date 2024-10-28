@@ -1,17 +1,31 @@
 import {error, json} from '@sveltejs/kit';
-import {verifyAddClient} from './schema.js';
 import {kysely} from '$lib/kysely/kysely.js';
 import type {NewClients} from '$lib/kysely/gen/public/Clients.js';
+import Ajv from 'ajv';
+const ajv = new Ajv({removeAdditional: true});
 
 export async function GET() {
     const clients = await kysely.selectFrom('clients').selectAll().execute();
     return json(clients);
 }
 
+const validatePOST = ajv.compile({
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+        name: {type: 'string'},
+        address: {type: 'string'},
+        email: {type: 'string'},
+        company_id: {type: 'number'},
+    },
+    required: ['name', 'address', 'company_id'],
+});
+
 export async function POST({request}) {
     const data = (await request.json()) as NewClients;
-    if (!verifyAddClient(data)) {
-        throw error(400, verifyAddClient.errors?.map(e => e.message).join('\n'));
+    if (!validatePOST(data)) {
+        throw error(400, validatePOST.errors?.map(e => e.message).join('\n'));
     }
     return json(await kysely.insertInto('clients').values(data).returningAll().executeTakeFirst());
 }
