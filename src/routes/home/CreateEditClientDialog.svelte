@@ -27,7 +27,6 @@
     );
 
     async function createClient() {
-        console.log(companyIdSelected);
         const response = await fetch(`/api/clients`, {
             method: 'POST',
             body: JSON.stringify({

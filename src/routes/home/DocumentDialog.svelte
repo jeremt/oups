@@ -2,13 +2,13 @@
     import Cross from '$lib/icons/Cross.svelte';
     import Trash from '$lib/icons/Trash.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
-    import {resize} from '$lib/helpers/resize';
-    import DateInput from '$lib/widgets/DateInput.svelte';
+    import {resize} from '$lib/actions/resize';
     import SearchClientDialog from './SearchClientDialog.svelte';
     import type {DocumentLine} from '$lib/supabase/types';
     import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
     import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
     import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
+    import ResizeInput from '$lib/widgets/ResizeInput.svelte';
 
     type Props = {
         isOpen: boolean;
@@ -47,6 +47,7 @@
         quantity_label: 'jour',
         client: {
             id: 1 as ClientsId,
+            company_id: 1 as CompaniesId,
             created_at: new Date(),
             name: 'Ada Tech School',
             address: '28 rue du Petit Musc\n75004 Paris',
@@ -117,7 +118,7 @@
                     {#if company.email}<div class="email">{company.email}</div>{/if}
                     {#if company.siren}<div>SIREN : {company.siren}</div>{/if}
                 </div>
-                <div class="date">Date d'émission : <DateInput bind:date={invoice.emitted_at} /></div>
+                <div class="date">Date d'émission : <input type="date" class="invisible" value={invoice.emitted_at} /></div>
             {/if}
             {#if invoice.client_id}
                 {@const client = invoice.client}
@@ -149,15 +150,14 @@
                     <tbody>
                         {#each invoice.lines as DocumentLine[] as line, i}
                             <tr>
-                                <td
-                                    ><input
+                                <td>
+                                    <ResizeInput
                                         bind:value={line.description}
                                         onchange={() => addOrRemoveLine(line, i)}
-                                        type="text"
                                         class="invisible editable-description"
                                         placeholder="Description"
-                                    /></td
-                                >
+                                    />
+                                </td>
                                 <td
                                     ><div class="editable-price">
                                         <input bind:value={line.price} onchange={() => addOrRemoveLine(line, i)} type="number" class="invisible" placeholder="500" /> €
@@ -171,20 +171,20 @@
                             </tr>
                         {/each}
                         <tr>
-                            <td
-                                ><input
+                            <td>
+                                <input
                                     bind:value={newLine.description}
                                     onchange={() => addOrRemoveLine(newLine, -1)}
                                     type="text"
                                     class="invisible editable-description"
                                     placeholder="Description"
-                                /></td
-                            >
-                            <td
-                                ><div class="editable-price">
+                                />
+                            </td>
+                            <td>
+                                <div class="editable-price">
                                     <input bind:value={newLine.price} onchange={() => addOrRemoveLine(newLine, -1)} type="number" class="invisible" placeholder="500" /> €
-                                </div></td
-                            >
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -274,6 +274,7 @@
     }
     .date {
         display: flex;
+        align-items: center;
         gap: 0.2rem;
 
         & :global(input.day),
@@ -312,6 +313,10 @@
                 height: calc(25px * var(--ratio));
                 border-width: calc(1px * var(--ratio));
                 border-color: var(--color-white-2);
+
+                & :global(textarea) {
+                    width: 100%;
+                }
             }
         }
     }

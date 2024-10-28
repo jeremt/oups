@@ -1,7 +1,7 @@
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
-    import {inputDebounce} from '$lib/helpers/inputDebounce';
+    import {inputDebounce} from '$lib/actions/inputDebounce';
     import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
     import Pen from '$lib/icons/Pen.svelte';
     import CreateEditClientDialog from './CreateEditClientDialog.svelte';
