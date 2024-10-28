@@ -43,8 +43,8 @@
             </tr>
         </thead>
         <tbody>
-            {#each data.invoices as invoice}
-                <TableLine {invoice} />
+            {#each data.documents as document}
+                <TableLine {document} />
             {/each}
         </tbody>
     </table>

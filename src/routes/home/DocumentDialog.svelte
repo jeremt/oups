@@ -4,7 +4,7 @@
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {resize} from '$lib/actions/resize';
     import SearchClientDialog from './SearchClientDialog.svelte';
-    import type {DocumentLine} from '$lib/supabase/types';
+    import type {DocumentLine} from '$lib/kysely/types';
     import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
     import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
     import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';

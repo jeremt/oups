@@ -1,4 +1,4 @@
-import {getCompanies} from '$lib/api/api';
+import {getCompanies} from '$lib/kysely/queries';
 import {error, json} from '@sveltejs/kit';
 
 export async function GET({locals}) {

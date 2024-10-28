@@ -1,13 +1,15 @@
 <script lang="ts">
     import {formatDate} from '$lib/helpers/formatDate';
-    import type {Companies} from '$lib/kysely/gen/public/Companies';
-    import type {Documents} from '$lib/kysely/gen/public/Documents';
+    import type {Document} from '$lib/kysely/queries';
+    import type {DocumentLine} from '$lib/kysely/types';
     import type DocumentStatus from '$lib/kysely/gen/public/DocumentStatus';
-    import type {DocumentLine} from '$lib/supabase/types';
 
-    let {invoice}: {invoice: Documents & {company: Companies}} = $props();
+    type Props = {
+        document: Document;
+    };
+    let {document}: Props = $props();
 
-    let status = $state(invoice.status);
+    let status = $state(document.status);
     let selectElement: HTMLSelectElement;
 
     const statusMap: Record<DocumentStatus, {name: string; color: string}> = {
@@ -22,7 +24,7 @@
     async function handleStatusChange(event: Event) {
         const select = event.target as HTMLSelectElement;
         status = select.value as DocumentStatus;
-        await fetch(`/api/invoices/${invoice.id}`, {
+        await fetch(`/api/invoices/${document.id}`, {
             method: 'PATCH',
             body: JSON.stringify({status}),
             headers: {
@@ -33,8 +35,8 @@
 </script>
 
 <tr>
-    <td class="name">{invoice.name} nº{invoice.number}</td>
-    <td>{invoice.company.name}</td>
+    <td class="name">{document.name} nº{document.number}</td>
+    <td>{document.company.name}</td>
     <td style:color={statusMap[status].color} onclick={() => selectElement.click()}>
         {statusMap[status].name}
         <select bind:this={selectElement} value={status} onchange={handleStatusChange}>
@@ -44,10 +46,10 @@
             <option value="declared">déclarée</option>
         </select>
     </td>
-    <td>{formatDate(new Date(invoice.created_at))}</td>
-    <td>{formatDate(new Date(invoice.emitted_at))}</td>
-    <td>{(invoice.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)}</td>
-    <td class="note">{@html invoice.note}</td>
+    <td>{formatDate(new Date(document.created_at))}</td>
+    <td>{formatDate(new Date(document.emitted_at))}</td>
+    <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)}</td>
+    <td class="note">{@html document.note}</td>
 </tr>
 
 <style>

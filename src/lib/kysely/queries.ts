@@ -1,9 +1,11 @@
-import Clients from '$lib/kysely/gen/public/Clients';
-import Companies, {CompaniesId} from '$lib/kysely/gen/public/Companies';
-import {UsersId} from '$lib/kysely/gen/public/Users';
-import {kysely} from '$lib/kysely/kysely';
-import {ConnectedUser} from '$lib/supabase/user';
 import {sql} from 'kysely';
+import {kysely} from '$lib/kysely/kysely';
+import type Clients from '$lib/kysely/gen/public/Clients';
+import type {UsersId} from '$lib/kysely/gen/public/Users';
+import type Companies from '$lib/kysely/gen/public/Companies';
+import type DocumentType from '$lib/kysely/gen/public/DocumentType';
+import type {CompaniesId} from '$lib/kysely/gen/public/Companies';
+import type {ConnectedUser} from '$lib/supabase/user';
 
 export async function getCompanies(user: ConnectedUser) {
     const companies = await kysely
@@ -29,7 +31,7 @@ export async function getCompanies(user: ConnectedUser) {
     return companies;
 }
 
-export async function getInvoices(companyIds: number[]) {
+export async function getDocuments(companyIds: number[], type: DocumentType) {
     if (companyIds.length === 0) {
         return [];
     }
@@ -58,9 +60,11 @@ export async function getInvoices(companyIds: number[]) {
         .leftJoin('companies', 'companies.id', 'documents.company_id')
         .leftJoin('clients', 'clients.id', 'documents.client_id')
         .where('documents.company_id', 'in', companyIds as CompaniesId[])
-        .where('type', '=', 'invoice')
+        .where('type', '=', type)
         .groupBy('documents.id')
         .execute();
 
     return invoices;
 }
+
+export type Document = Awaited<ReturnType<typeof getDocuments>>[number];

@@ -1,4 +1,4 @@
-import {getCompanies, getInvoices} from '$lib/api/api';
+import {getCompanies, getDocuments} from '$lib/kysely/queries';
 import {redirect} from '@sveltejs/kit';
 
 export async function load({locals}) {
@@ -9,6 +9,9 @@ export async function load({locals}) {
 
     return {
         companies,
-        invoices: await getInvoices(companies.map(c => c.id as number)),
+        documents: await getDocuments(
+            companies.map(c => c.id as number),
+            'invoice',
+        ),
     };
 }

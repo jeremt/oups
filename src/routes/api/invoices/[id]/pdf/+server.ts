@@ -2,13 +2,13 @@ import {read} from '$app/server';
 import fontkit from '@pdf-lib/fontkit';
 import {formatDate} from '$lib/helpers/formatDate';
 import {grayscale, PDFDocument, PDFFont} from 'pdf-lib';
+import type {DocumentLine} from '$lib/kysely/types';
+import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
 import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
 import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
-import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
 
 import BricolageGrotesque from './fonts/BricolageGrotesque-Regular.ttf';
 import BricolageGrotesqueBold from './fonts/BricolageGrotesque-Bold.ttf';
-import {DocumentLine} from '$lib/supabase/types';
 
 const pageMargin = 50;
 const lineHeight = 20;
@@ -44,6 +44,7 @@ export async function GET() {
         quantity_label: 'jour',
         client: {
             id: 1 as ClientsId,
+            company_id: 1 as CompaniesId,
             created_at: new Date(),
             name: 'Ada Tech School',
             address: '28 rue du Petit Musc\n75004 Paris',

@@ -6,13 +6,15 @@
     import Pen from '$lib/icons/Pen.svelte';
     import CreateEditClientDialog from './CreateEditClientDialog.svelte';
     import {onMount} from 'svelte';
+    import {CompaniesId} from '$lib/kysely/gen/public/Companies';
 
     type Props = {isOpen: boolean; onSelect: (client: Clients) => void};
     let {isOpen = $bindable(false), onSelect}: Props = $props();
 
-    let clients: Clients[] = $state([
+    let clients = $state<Clients[]>([
         {
             id: 0 as ClientsId,
+            company_id: 1 as CompaniesId,
             created_at: new Date(),
             updated_at: new Date(),
             name: 'Ada Tech School',
@@ -22,6 +24,7 @@
         },
         {
             id: 1 as ClientsId,
+            company_id: 1 as CompaniesId,
             created_at: new Date(),
             updated_at: new Date(),
             name: 'Pierre Lacombe',
