@@ -228,7 +228,8 @@
         box-shadow: 0 0.2rem 2rem hsla(0, 0%, 0%, 0.3);
         width: 100%;
         white-space: pre-line;
-        & input {
+        & input,
+        & :global(textarea) {
             color: inherit;
         }
     }
@@ -306,9 +307,6 @@
             width: calc(100% + 40px * var(--ratio));
             & th,
             & td {
-                & input {
-                    font-size: calc(12px * var(--ratio));
-                }
                 padding: 0 calc(8px * var(--ratio));
                 height: calc(25px * var(--ratio));
                 border-width: calc(1px * var(--ratio));
@@ -316,6 +314,7 @@
 
                 & :global(textarea) {
                     width: 100%;
+                    font-size: calc(12px * var(--ratio));
                 }
             }
         }

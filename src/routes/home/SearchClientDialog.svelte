@@ -2,52 +2,35 @@
     import Cross from '$lib/icons/Cross.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {inputDebounce} from '$lib/actions/inputDebounce';
-    import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
+    import type {Clients} from '$lib/kysely/gen/public/Clients';
     import Pen from '$lib/icons/Pen.svelte';
     import CreateEditClientDialog from './CreateEditClientDialog.svelte';
-    import {onMount} from 'svelte';
-    import type {CompaniesId} from '$lib/kysely/gen/public/Companies';
+    import {queryFilter} from '$lib/helpers/queryFilter';
 
     type Props = {isOpen: boolean; onSelect: (client: Clients) => void};
     let {isOpen = $bindable(false), onSelect}: Props = $props();
 
-    let clients = $state<Clients[]>([
-        {
-            id: 0 as ClientsId,
-            company_id: 1 as CompaniesId,
-            created_at: new Date(),
-            updated_at: new Date(),
-            name: 'Ada Tech School',
-            address: '28 rue du Petit Musc, 75004 Paris',
-            email: null,
-            logo_url: null,
-        },
-        {
-            id: 1 as ClientsId,
-            company_id: 1 as CompaniesId,
-            created_at: new Date(),
-            updated_at: new Date(),
-            name: 'Pierre Lacombe',
-            address: '44 rue des navettes, 123456 Kourou, Guyanne.',
-            email: 'pie.lacombe@gmail.com',
-            logo_url: null,
-        },
-    ]);
+    let clients = $state<Clients[]>([]);
 
     let query = $state('');
     let selectedClient = $state<Clients | undefined>(undefined);
 
     let isCreateOrEditOpen = $state(false);
+    const filteredClients = $derived(query ? clients.filter(c => queryFilter([c.name, c.email ?? '', c.address], query)) : clients);
 
-    function handleSearch() {}
+    function handleSearch(value: string) {
+        query = value;
+    }
 
-    onMount(async () => {
-        const response = await fetch(`/api/clients`, {
-            method: 'GET',
-        });
-        if (response.status === 200) {
-            clients = await response.json();
-        }
+    $effect(() => {
+        (async () => {
+            const response = await fetch(`/api/clients`, {
+                method: 'GET',
+            });
+            if (response.status === 200) {
+                clients = await response.json();
+            }
+        })();
     });
 </script>
 
@@ -66,7 +49,7 @@
         >
     </header>
     <div class="clients">
-        {#each clients as client}
+        {#each filteredClients as client}
             <!-- TODO: improve a11y -->
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
