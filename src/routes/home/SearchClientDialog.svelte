@@ -6,7 +6,7 @@
     import Pen from '$lib/icons/Pen.svelte';
     import CreateEditClientDialog from './CreateEditClientDialog.svelte';
     import {onMount} from 'svelte';
-    import {CompaniesId} from '$lib/kysely/gen/public/Companies';
+    import type {CompaniesId} from '$lib/kysely/gen/public/Companies';
 
     type Props = {isOpen: boolean; onSelect: (client: Clients) => void};
     let {isOpen = $bindable(false), onSelect}: Props = $props();
