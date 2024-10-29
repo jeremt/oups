@@ -187,10 +187,10 @@
                         {/each}
                         <tr>
                             <td>
-                                <input
+                                <ResizeInput
+                                    rows={1}
                                     bind:value={newLine.description}
                                     onchange={() => addOrRemoveLine(newLine, -1)}
-                                    type="text"
                                     class="invisible editable-description"
                                     placeholder="Description"
                                 />
@@ -328,7 +328,16 @@
                 border-width: calc(1px * var(--ratio));
                 border-color: var(--color-white-2);
 
+                & .editable-price {
+                    height: 100%;
+                    padding-top: calc(5px * var(--ratio));
+                    & input[type='number'] {
+                        font-size: calc(12px * var(--ratio));
+                        width: calc(60px * var(--ratio));
+                    }
+                }
                 & :global(textarea) {
+                    margin-top: calc(5px * var(--ratio));
                     width: 100%;
                     font-size: calc(12px * var(--ratio));
                 }
@@ -338,15 +347,5 @@
     .payment-title {
         font-weight: bold;
         font-size: calc(14px * var(--ratio));
-    }
-    .editable-description {
-        width: 100%;
-    }
-    .editable-price {
-        display: flex;
-        align-items: center;
-        & input[type='number'] {
-            width: 3.8rem;
-        }
     }
 </style>
