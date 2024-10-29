@@ -80,10 +80,10 @@
         {/if}
     </header>
     <div class="form">
-        <ResizeInput placeholder="Nom du client" bind:value={client.name}></ResizeInput>
-        <ResizeInput placeholder="Adresse" bind:value={client.address}></ResizeInput>
-        <ResizeInput placeholder="Adresse email" bind:value={client.email}></ResizeInput>
-        <ResizeInput placeholder="URL du logo" bind:value={client.logoUrl}></ResizeInput>
+        <input type="text" placeholder="Nom du client" bind:value={client.name} />
+        <input type="email" placeholder="Adresse email" bind:value={client.email} />
+        <ResizeInput placeholder="Adresse" bind:value={client.address} />
+        <input type="text" placeholder="URL du logo" bind:value={client.logoUrl} />
         <EnhancedSelect bind:value={companyIdSelected} {options} placeholder="Entreprise" />
     </div>
     {#if error}

@@ -98,6 +98,7 @@ input[type='password']:not(.invisible),
 input[type='email']:not(.invisible),
 input[type='number']:not(.invisible),
 input[type='date']:not(.invisible),
+input[type='phone']:not(.invisible),
 textarea:not(.invisible) {
     border: 2px solid var(--color-bg-2);
     border-radius: 0.5em;

@@ -115,7 +115,17 @@
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
             {#if invoice.company}
                 {@const company = invoice.company}
-                <div class="company">
+                <div
+                    class="company"
+                    onclick={() => (isCompaniesOpen = true)}
+                    role="button"
+                    tabindex="0"
+                    onkeydown={e => {
+                        if (e.key === 'Enter') {
+                            isCompaniesOpen = true;
+                        }
+                    }}
+                >
                     {#if company.name}<div class="name">{company.name}</div>{/if}
                     {#if company.address}<div class="address">{company.address}</div>{/if}
                     {#if company.phone}<div>{company.phone}</div>{/if}

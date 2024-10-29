@@ -5,15 +5,16 @@
     import Pen from '$lib/icons/Pen.svelte';
     import {queryFilter} from '$lib/helpers/queryFilter';
     import type {Company} from '$lib/kysely/queries';
+    import CreateEditCompanyDialog from './CreateEditCompanyDialog.svelte';
 
     type Props = {isOpen: boolean; onSelect: (company: Company) => void; companies: Company[]};
     let {isOpen = $bindable(false), onSelect, companies}: Props = $props();
 
     let query = $state('');
-    let selectedCompany = $state<Company | undefined>(undefined);
+    let selected = $state<Company | undefined>(undefined);
 
     let isCreateOrEditOpen = $state(false);
-    const filteredCompanies = $derived(query ? companies.filter(c => queryFilter([c.name, c.address], query)) : companies);
+    const filteredItems = $derived(query ? companies.filter(c => queryFilter([c.name, c.address], query)) : companies);
 
     function handleSearch(value: string) {
         query = value;
@@ -29,13 +30,13 @@
         <button
             class="btn"
             onclick={() => {
-                selectedCompany = undefined;
+                selected = undefined;
                 isCreateOrEditOpen = true;
             }}>Ajouter</button
         >
     </header>
     <div class="list">
-        {#each filteredCompanies as company}
+        {#each filteredItems as company}
             <!-- TODO: improve a11y -->
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -53,7 +54,7 @@
                         class="icon"
                         onclick={e => {
                             e.stopPropagation();
-                            selectedCompany = company;
+                            selected = company;
                             isCreateOrEditOpen = true;
                         }}><Pen /></button
                     >
@@ -64,7 +65,7 @@
     </div>
 </Dialog>
 
-<!-- <CreateEditClientDialog bind:isOpen={isCreateOrEditOpen} selectedClient={selectedCompany} /> -->
+<CreateEditCompanyDialog bind:isOpen={isCreateOrEditOpen} {selected} />
 
 <style>
     header {
