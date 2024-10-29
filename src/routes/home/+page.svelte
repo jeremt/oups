@@ -48,7 +48,7 @@
             {/each}
         </tbody>
     </table>
-    <DocumentDialog bind:isOpen={isDocumentOpen} />
+    <DocumentDialog bind:isOpen={isDocumentOpen} companies={data.companies} />
 </main>
 
 <style>

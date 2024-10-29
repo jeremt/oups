@@ -22,7 +22,7 @@
             name: '',
             address: '',
             email: '',
-            logo_url: '',
+            logoUrl: '',
         },
     );
 
@@ -31,7 +31,7 @@
             method: 'POST',
             body: JSON.stringify({
                 ...client,
-                company_id: companyIdSelected,
+                companyId: companyIdSelected,
             }),
         });
         if (response.status === 200) {
@@ -45,7 +45,7 @@
             method: 'PATCH',
             body: JSON.stringify({
                 ...client,
-                company_id: companyIdSelected,
+                companyId: companyIdSelected,
             }),
         });
         if (response.status === 200) {
@@ -59,7 +59,7 @@
         const response = await fetch(`/api/companies`);
         if (response.status === 200) {
             const companies: Companies[] = await response.json();
-            options = companies.map(c => ({id: c.id as number, image: c.logo_url ?? '', label: c.name}));
+            options = companies.map(c => ({id: c.id as number, image: c.logoUrl ?? '', label: c.name}));
         } else {
             error = (await response.json())?.message;
         }
@@ -83,7 +83,7 @@
         <ResizeInput placeholder="Nom du client" bind:value={client.name}></ResizeInput>
         <ResizeInput placeholder="Adresse" bind:value={client.address}></ResizeInput>
         <ResizeInput placeholder="Adresse email" bind:value={client.email}></ResizeInput>
-        <ResizeInput placeholder="URL du logo" bind:value={client.logo_url}></ResizeInput>
+        <ResizeInput placeholder="URL du logo" bind:value={client.logoUrl}></ResizeInput>
         <EnhancedSelect bind:value={companyIdSelected} {options} placeholder="Entreprise" />
     </div>
     {#if error}

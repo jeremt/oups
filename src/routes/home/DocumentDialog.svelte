@@ -3,28 +3,32 @@
     import Trash from '$lib/icons/Trash.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
     import {resize} from '$lib/actions/resize';
-    import SearchClientDialog from './SearchClientDialog.svelte';
-    import type {DocumentLine} from '$lib/kysely/types';
-    import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
-    import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
-    import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
     import ResizeInput from '$lib/widgets/ResizeInput.svelte';
+    import SearchClientDialog from './SearchClientDialog.svelte';
+    import SearchCompanyDialog from './SearchCompanyDialog.svelte';
+    import type {Company} from '$lib/kysely/queries';
+    import type {Clients} from '$lib/kysely/gen/public/Clients';
+    import type {Documents} from '$lib/kysely/gen/public/Documents';
+    import type {Companies} from '$lib/kysely/gen/public/Companies';
+    import type {DocumentLine} from '$lib/kysely/types';
 
     type Props = {
         isOpen: boolean;
+        companies: Company[];
     };
-    let {isOpen = $bindable(false)}: Props = $props();
+    let {isOpen = $bindable(false), companies}: Props = $props();
 
     let isClientsOpen = $state(false);
+    let isCompaniesOpen = $state(false);
     let mode = $state<'add' | 'edit'>('add');
-    let invoice = $state<Omit<Documents, 'emitted_at'> & {company: Companies; client: Clients; emitted_at: string}>({
-        id: 1 as DocumentsId,
-        client_id: 1 as ClientsId,
-        organization_id: null,
-        company_id: 1 as CompaniesId,
-        created_at: new Date(),
-        updated_at: new Date(),
-        emitted_at: new Date().toISOString(),
+    let invoice = $state<Omit<Documents, 'emittedAt'> & {company: Companies; client: Clients; emittedAt: string}>({
+        id: 1,
+        clientId: 1,
+        organizationId: null,
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        emittedAt: new Date().toISOString(),
         lines: [
             {price: 3200, description: 'Encadrement'},
             {price: 150, description: 'Réunions'},
@@ -43,32 +47,32 @@
         status: 'generated',
         note: '',
         type: 'invoice',
-        quantity_base: 600,
-        quantity_label: 'jour',
+        quantityBase: 600,
+        quantityLabel: 'jour',
         client: {
-            id: 1 as ClientsId,
-            company_id: 1 as CompaniesId,
-            created_at: new Date(),
+            id: 1,
+            companyId: 1,
+            createdAt: new Date(),
             name: 'Ada Tech School',
             address: '28 rue du Petit Musc\n75004 Paris',
-            updated_at: new Date(),
-            logo_url: null,
+            updatedAt: new Date(),
+            logoUrl: null,
             email: null,
         },
         company: {
-            id: 1 as CompaniesId,
-            quote_sequence: 14,
-            invoice_sequence: 1,
-            created_at: new Date(),
-            updated_at: new Date(),
+            id: 1,
+            quoteSequence: 14,
+            invoiceSequence: 1,
+            createdAt: new Date(),
+            updatedAt: new Date(),
             name: 'M JÉRÉMIE TABOADA ALVAREZ',
             address: '11 rue de Pommard\n75012 Paris',
             bic: 'AGRIFRPP882',
             iban: 'FR76 1820 6000 5165 0085 3209 021',
             siren: '853 291 268',
-            email: 'taboada.jeremie@gmail.com',
-            phone: '06 24 91 22 44',
-            logo_url: null,
+            logoUrl: null,
+            email: 'test@test.com',
+            phone: '0624912244',
         },
     });
     let newLine = $state<DocumentLine>({description: '', price: 0});
@@ -118,9 +122,9 @@
                     {#if company.email}<div class="email">{company.email}</div>{/if}
                     {#if company.siren}<div>SIREN : {company.siren}</div>{/if}
                 </div>
-                <div class="date">Date d'émission : <input type="date" class="invisible" value={invoice.emitted_at} /></div>
+                <div class="date">Date d'émission : <input type="date" class="invisible" value={invoice.emittedAt} /></div>
             {/if}
-            {#if invoice.client_id}
+            {#if invoice.clientId}
                 {@const client = invoice.client}
                 <div
                     class="client"
@@ -193,7 +197,7 @@
                     Total (HT) : {(invoice.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €
                 </div>
                 <div style:text-align="right">TVA Non applicable</div>
-                {#if invoice.company_id}
+                {#if invoice.companyId}
                     {@const company = invoice.company}
                     <div class="payment-title">Informations de paiement</div>
                     <div class="payment-infos">BIC : {company.bic}<br />IBAN : {company.iban}</div>
@@ -205,6 +209,7 @@
     </div>
 </Dialog>
 <SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (invoice.client = client)} />
+<SearchCompanyDialog bind:isOpen={isCompaniesOpen} onSelect={company => console.log(company)} {companies} />
 
 <style>
     .editor {

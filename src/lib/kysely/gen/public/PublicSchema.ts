@@ -9,15 +9,15 @@ import type { default as ClientsTable } from './Clients';
 import type { default as DocumentsTable } from './Documents';
 
 export default interface PublicSchema {
-  users: UsersTable;
+  'public.users': UsersTable;
 
-  companies: CompaniesTable;
+  'public.companies': CompaniesTable;
 
-  organizations: OrganizationsTable;
+  'public.organizations': OrganizationsTable;
 
-  users_organizations: UsersOrganizationsTable;
+  'public.usersOrganizations': UsersOrganizationsTable;
 
-  clients: ClientsTable;
+  'public.clients': ClientsTable;
 
-  documents: DocumentsTable;
+  'public.documents': DocumentsTable;
 }

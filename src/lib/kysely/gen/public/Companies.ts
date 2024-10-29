@@ -4,19 +4,19 @@
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 /** Identifier type for public.companies */
-export type CompaniesId = number & { __brand: 'CompaniesId' };
+export type PublicCompaniesId = number;
 
 /** Represents the table public.companies */
 export default interface CompaniesTable {
-  id: ColumnType<CompaniesId, never, never>;
+  id: ColumnType<PublicCompaniesId, never, never>;
 
-  created_at: ColumnType<Date, Date | string | undefined, Date | string>;
+  createdAt: ColumnType<Date, Date | string | undefined, Date | string>;
 
-  updated_at: ColumnType<Date, Date | string | undefined, Date | string>;
+  updatedAt: ColumnType<Date, Date | string | undefined, Date | string>;
 
   name: ColumnType<string, string, string>;
 
-  logo_url: ColumnType<string | null, string | null, string | null>;
+  logoUrl: ColumnType<string | null, string | null, string | null>;
 
   address: ColumnType<string, string, string>;
 
@@ -30,9 +30,9 @@ export default interface CompaniesTable {
 
   phone: ColumnType<string | null, string | null, string | null>;
 
-  quote_sequence: ColumnType<number, number | undefined, number>;
+  quoteSequence: ColumnType<number, number | undefined, number>;
 
-  invoice_sequence: ColumnType<number, number | undefined, number>;
+  invoiceSequence: ColumnType<number, number | undefined, number>;
 }
 
 export type Companies = Selectable<CompaniesTable>;

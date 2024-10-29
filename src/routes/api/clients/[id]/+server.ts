@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import {error, json} from '@sveltejs/kit';
 import {kysely} from '$lib/kysely/kysely.js';
-import type {ClientsId, ClientsUpdate} from '$lib/kysely/gen/public/Clients.js';
+import type {ClientsUpdate} from '$lib/kysely/gen/public/Clients.js';
 
 const ajv = new Ajv({removeAdditional: true});
 
@@ -13,9 +13,9 @@ const validatePATCH = ajv.compile({
         name: {type: 'string'},
         address: {type: 'string'},
         email: {type: 'string'},
-        company_id: {type: 'number'},
+        companyId: {type: 'number'},
     },
-    required: ['name', 'address', 'company_id'],
+    required: ['name', 'address', 'companyId'],
 });
 
 export async function PATCH({params, request}) {
@@ -25,12 +25,7 @@ export async function PATCH({params, request}) {
     if (!validatePATCH(data)) {
         return error(400, validatePATCH.errors?.map(e => e.message).join('\n'));
     }
-    const client = await kysely
-        .updateTable('clients')
-        .set(data)
-        .where('id', '=', id as ClientsId)
-        .returningAll()
-        .executeTakeFirstOrThrow();
+    const client = await kysely.updateTable('public.clients').set(data).where('id', '=', id).returningAll().executeTakeFirstOrThrow();
 
     return json(client);
 }
@@ -38,9 +33,6 @@ export async function PATCH({params, request}) {
 export async function DELETE({params}) {
     const id = parseInt(params.id);
 
-    await kysely
-        .deleteFrom('clients')
-        .where('id', '=', id as ClientsId)
-        .execute();
+    await kysely.deleteFrom('public.clients').where('id', '=', id).execute();
     return json({});
 }

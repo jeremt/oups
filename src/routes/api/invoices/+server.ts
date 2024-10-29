@@ -58,18 +58,18 @@ export async function POST({request}) {
     }
 
     const invoice = await kysely.transaction().execute(async trx => {
-        const {invoice_sequence} = await trx
-            .updateTable('companies')
-            .set(eb => ({invoice_sequence: eb('invoice_sequence', '+', 1)}))
+        const {invoiceSequence} = await trx
+            .updateTable('public.companies')
+            .set(eb => ({invoiceSequence: eb('public.companies.invoiceSequence', '+', 1)}))
             .where('id', '=', data.company_id)
-            .returning('invoice_sequence')
+            .returning('invoiceSequence')
             .executeTakeFirstOrThrow();
         return await trx
-            .insertInto('documents')
+            .insertInto('public.documents')
             .values({
                 ...data,
                 type: 'invoice',
-                number: invoice_sequence,
+                number: invoiceSequence,
                 status: 'generated',
             })
             .returningAll()

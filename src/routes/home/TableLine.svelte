@@ -46,8 +46,8 @@
             <option value="declared">déclarée</option>
         </select>
     </td>
-    <td>{formatDate(new Date(document.created_at))}</td>
-    <td>{formatDate(new Date(document.emitted_at))}</td>
+    <td>{formatDate(new Date(document.createdAt))}</td>
+    <td>{formatDate(new Date(document.emittedAt))}</td>
     <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)}</td>
     <td class="note">{@html document.note}</td>
 </tr>

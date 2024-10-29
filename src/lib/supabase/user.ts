@@ -1,5 +1,4 @@
 import {browser} from '$app/environment';
-import { Companies } from '$lib/kysely/gen/public/Companies';
 import {getContext, setContext} from 'svelte';
 
 export interface ConnectedUser {
@@ -9,7 +8,6 @@ export interface ConnectedUser {
     name: string;
     email: string;
     admin?: boolean;
-    company?: Companies;
     avatar_url: string;
 }
 

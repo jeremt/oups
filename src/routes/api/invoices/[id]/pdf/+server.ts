@@ -2,10 +2,10 @@ import {read} from '$app/server';
 import fontkit from '@pdf-lib/fontkit';
 import {formatDate} from '$lib/helpers/formatDate';
 import {grayscale, PDFDocument, PDFFont} from 'pdf-lib';
+import type {Clients} from '$lib/kysely/gen/public/Clients';
+import type {Documents} from '$lib/kysely/gen/public/Documents';
+import type {Companies} from '$lib/kysely/gen/public/Companies';
 import type {DocumentLine} from '$lib/kysely/types';
-import type {Clients, ClientsId} from '$lib/kysely/gen/public/Clients';
-import type {Documents, DocumentsId} from '$lib/kysely/gen/public/Documents';
-import type {Companies, CompaniesId} from '$lib/kysely/gen/public/Companies';
 
 import BricolageGrotesque from './fonts/BricolageGrotesque-Regular.ttf';
 import BricolageGrotesqueBold from './fonts/BricolageGrotesque-Bold.ttf';
@@ -15,13 +15,13 @@ const lineHeight = 20;
 
 export async function GET() {
     const invoice: Documents & {company: Companies; client: Clients} = {
-        id: 1 as DocumentsId,
-        client_id: 1 as ClientsId,
-        organization_id: null,
-        company_id: 1 as CompaniesId,
-        created_at: new Date(),
-        updated_at: new Date(),
-        emitted_at: new Date(),
+        id: 1,
+        clientId: 1,
+        organizationId: null,
+        companyId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        emittedAt: new Date(),
         lines: [
             {price: 3200, description: 'Encadrement'},
             {price: 150, description: 'Réunions'},
@@ -40,24 +40,24 @@ export async function GET() {
         status: 'generated',
         note: '',
         type: 'invoice',
-        quantity_base: 600,
-        quantity_label: 'jour',
+        quantityBase: 600,
+        quantityLabel: 'jour',
         client: {
-            id: 1 as ClientsId,
-            company_id: 1 as CompaniesId,
-            created_at: new Date(),
+            id: 1,
+            companyId: 1,
+            createdAt: new Date(),
             name: 'Ada Tech School',
             address: '28 rue du Petit Musc\n75004 Paris',
-            updated_at: new Date(),
-            logo_url: null,
+            updatedAt: new Date(),
+            logoUrl: null,
             email: null,
         },
         company: {
-            id: 1 as CompaniesId,
-            quote_sequence: 14,
-            invoice_sequence: 1,
-            created_at: new Date(),
-            updated_at: new Date(),
+            id: 1,
+            quoteSequence: 14,
+            invoiceSequence: 1,
+            createdAt: new Date(),
+            updatedAt: new Date(),
             name: 'M JÉRÉMIE TABOADA ALVAREZ',
             address: '11 rue de Pommard\n75012 Paris',
             bic: 'AGRIFRPP882',
@@ -65,7 +65,7 @@ export async function GET() {
             siren: '853 291 268',
             email: 'taboada.jeremie@gmail.com',
             phone: '06 24 91 22 44',
-            logo_url: null,
+            logoUrl: null,
         },
     };
 
@@ -98,7 +98,7 @@ export async function GET() {
     page.moveDown(lineHeight / 2);
     page.drawText(`SIREN : ${company.siren}`, {font, size: 12});
     page.moveDown(lineHeight);
-    page.drawText(`Date d'émission : ${formatDate(invoice.emitted_at)}`, {font, size: 12});
+    page.drawText(`Date d'émission : ${formatDate(invoice.emittedAt)}`, {font, size: 12});
 
     // client
     const client = invoice.client;
