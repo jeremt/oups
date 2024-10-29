@@ -1,10 +1,7 @@
-import {NewCompanies} from '$lib/kysely/gen/public/Companies.js';
 import {kysely} from '$lib/kysely/kysely';
 import {getCompanies} from '$lib/kysely/queries';
+import {createValidator} from '$lib/schema/validate';
 import {error, json} from '@sveltejs/kit';
-import Ajv from 'ajv';
-
-const ajv = new Ajv({removeAdditional: true});
 
 export async function GET({locals}) {
     const user = await locals.getUser();
@@ -15,7 +12,7 @@ export async function GET({locals}) {
     return json(companies);
 }
 
-const validatePOST = ajv.compile({
+const validatePOST = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
@@ -32,7 +29,7 @@ const validatePOST = ajv.compile({
 
 export async function POST({request, locals}) {
     const user = await locals.getUser();
-    const data = (await request.json()) as NewCompanies;
+    const data = await request.json();
     if (!validatePOST(data)) {
         throw error(400, validatePOST.errors?.map(e => e.message).join('\n'));
     }

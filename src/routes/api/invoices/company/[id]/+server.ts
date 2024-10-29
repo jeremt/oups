@@ -1,4 +1,4 @@
-import {kysely} from '$lib/kysely/kysely.js';
+import {kysely} from '$lib/kysely/kysely';
 import {json} from '@sveltejs/kit';
 
 export async function GET({params}) {

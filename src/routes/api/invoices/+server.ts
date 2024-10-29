@@ -1,35 +1,23 @@
 import {json} from '@sveltejs/kit';
-import {kysely} from '$lib/kysely/kysely.js';
-import {NewDocuments} from '$lib/kysely/gen/public/Documents.js';
-import Ajv from 'ajv';
+import {kysely} from '$lib/kysely/kysely';
+import {NewDocuments} from '$lib/kysely/gen/public/Documents';
+import {createValidator} from '$lib/schema/validate';
 
-const ajv = new Ajv({removeAdditional: true});
-
-const validatePOST = ajv.compile({
+const validatePOST = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
     properties: {
-        name: {
-            type: 'string',
-        },
-        client_id: {
-            type: 'string',
-        },
-        company_id: {
-            type: 'string',
-        },
-        emitted_at: {
-            type: 'string',
-        },
+        name: {type: 'string'},
+        clientId: {type: 'string'},
+        companyId: {type: 'string'},
+        emittedAt: {type: 'string'},
         lines: {
             type: 'array',
             items: {
                 type: 'object',
                 properties: {
-                    description: {
-                        type: 'string',
-                    },
+                    description: {type: 'string'},
                     price: {
                         type: 'number',
                     },
@@ -37,14 +25,10 @@ const validatePOST = ajv.compile({
                 required: ['description', 'price'],
             },
         },
-        organisation_id: {
-            type: 'string',
-        },
-        quantity_label: {
-            type: 'string',
-        },
+        organisationId: {type: 'string'},
+        quantity_label: {type: 'string'},
     },
-    required: ['client_id', 'company_id', 'emission_date', 'lines', 'name', 'organisation_id', 'quantity_label'],
+    required: ['clientId', 'companyId', 'emittedAt', 'lines', 'name', 'organisationId', 'quantity_label'],
 });
 
 export async function POST({request}) {
@@ -61,7 +45,7 @@ export async function POST({request}) {
         const {invoiceSequence} = await trx
             .updateTable('public.companies')
             .set(eb => ({invoiceSequence: eb('public.companies.invoiceSequence', '+', 1)}))
-            .where('id', '=', data.company_id)
+            .where('id', '=', data.companyId)
             .returning('invoiceSequence')
             .executeTakeFirstOrThrow();
         return await trx

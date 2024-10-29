@@ -1,11 +1,8 @@
-import Ajv from 'ajv';
+import {kysely} from '$lib/kysely/kysely';
 import {error, json} from '@sveltejs/kit';
-import {kysely} from '$lib/kysely/kysely.js';
-import type {CompaniesUpdate} from '$lib/kysely/gen/public/Companies';
+import {createValidator} from '$lib/schema/validate';
 
-const ajv = new Ajv({removeAdditional: true});
-
-const validatePATCH = ajv.compile({
+const validatePATCH = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
@@ -23,7 +20,7 @@ const validatePATCH = ajv.compile({
 export async function PATCH({params, request}) {
     const id = parseInt(params.id);
 
-    const data = (await request.json()) as CompaniesUpdate;
+    const data = await request.json();
     if (!validatePATCH(data)) {
         return error(400, validatePATCH.errors?.map(e => e.message).join('\n'));
     }

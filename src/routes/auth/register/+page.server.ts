@@ -1,4 +1,4 @@
-import {kysely} from '$lib/kysely/kysely.js';
+import {kysely} from '$lib/kysely/kysely';
 import {fail, redirect} from '@sveltejs/kit';
 
 export const actions = {

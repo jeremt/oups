@@ -1,16 +1,13 @@
 import {error, json} from '@sveltejs/kit';
-import {kysely} from '$lib/kysely/kysely.js';
-import type {NewClients} from '$lib/kysely/gen/public/Clients.js';
-import Ajv from 'ajv';
-
-const ajv = new Ajv({removeAdditional: true});
+import {kysely} from '$lib/kysely/kysely';
+import {createValidator} from '$lib/schema/validate';
 
 export async function GET() {
     const clients = await kysely.selectFrom('public.clients').selectAll().execute();
     return json(clients);
 }
 
-const validatePOST = ajv.compile({
+const validatePOST = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
@@ -24,7 +21,7 @@ const validatePOST = ajv.compile({
 });
 
 export async function POST({request}) {
-    const data = (await request.json()) as NewClients;
+    const data = await request.json();
     if (!validatePOST(data)) {
         throw error(400, validatePOST.errors?.map(e => e.message).join('\n'));
     }

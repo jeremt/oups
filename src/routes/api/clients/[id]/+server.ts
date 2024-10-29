@@ -1,11 +1,9 @@
-import Ajv from 'ajv';
 import {error, json} from '@sveltejs/kit';
-import {kysely} from '$lib/kysely/kysely.js';
-import type {ClientsUpdate} from '$lib/kysely/gen/public/Clients.js';
+import {kysely} from '$lib/kysely/kysely';
+import {createValidator} from '$lib/schema/validate';
+import type {ClientsUpdate} from '$lib/kysely/gen/public/Clients';
 
-const ajv = new Ajv({removeAdditional: true});
-
-const validatePATCH = ajv.compile({
+const validatePATCH = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
