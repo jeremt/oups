@@ -152,6 +152,7 @@
                             <tr>
                                 <td>
                                     <ResizeInput
+                                        rows={1}
                                         bind:value={line.description}
                                         onchange={() => addOrRemoveLine(line, i)}
                                         class="invisible editable-description"
