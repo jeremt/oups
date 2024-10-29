@@ -1,5 +1,13 @@
 import {fail, redirect} from '@sveltejs/kit';
 
+export async function load({locals}) {
+    const user = await locals.getUser();
+
+    if (user.type !== 'anon') {
+        throw redirect(302, '/home');
+    }
+}
+
 export const actions = {
     default: async ({locals, request, cookies}) => {
         const form = await request.formData();

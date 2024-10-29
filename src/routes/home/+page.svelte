@@ -28,7 +28,9 @@
         <a href="#quotes" style:margin-right="auto">Devis</a>
         <button class="btn" onclick={() => (isDocumentOpen = true)}>Créer</button>
         <ColorSchemeToggle />
-        <a href="/logout" data-sveltekit-reload>Se déconnecter</a>
+        <form method="POST" action="/auth/logout">
+            <button class="btn" style:background-color="var(--color-fg)" type="submit">Déconnexion</button>
+        </form>
     </header>
     <table>
         <thead>
