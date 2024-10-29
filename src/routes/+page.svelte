@@ -20,7 +20,7 @@
     <div class="subtitle">Gestionnaire de factures & devis<br />pour éviter les erreurs 😅</div>
     <form method="post">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" value={form?.email} />
+        <input id="email" name="email" type="email" placeholder="picsou@disney.fr" autocomplete="email" value={form?.email} />
         <label for="password">Password</label>
         <input id="password" name="password" type="password" autocomplete="current-password" />
         <button class="btn" type="submit" style:margin-top="0.5rem">Login</button>

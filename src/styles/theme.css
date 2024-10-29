@@ -22,21 +22,21 @@
 }
 
 html[color-scheme='dark'] {
-    --color-fg: var(--color-white);
-    --color-fg-1: var(--color-white-1);
-    --color-fg-2: var(--color-gray);
-    --color-bg: var(--color-black);
-    --color-bg-1: var(--color-black-1);
-    --color-bg-2: var(--color-black-2);
+    --color-fg: #ffffff;
+    --color-fg-1: #cccccc;
+    --color-fg-2: #aaaaaa;
+    --color-bg: #151515;
+    --color-bg-1: #333333;
+    --color-bg-2: #444444;
 }
 
 html[color-scheme='light'] {
-    --color-fg: var(--color-black);
-    --color-fg-1: var(--color-black-1);
-    --color-fg-2: var(--color-gray);
-    --color-bg: var(--color-white);
-    --color-bg-1: var(--color-white-1);
-    --color-bg-2: var(--color-white-2);
+    --color-fg: #222222;
+    --color-fg-1: #888888;
+    --color-fg-2: #aaaaaa;
+    --color-bg: #ffffff;
+    --color-bg-1: #eeeeee;
+    --color-bg-2: #cccccc;
 }
 
 /* Root */
@@ -128,7 +128,7 @@ textarea.invisible {
     border-radius: 0.3em;
     color: var(--color-fg);
     &::placeholder {
-        color: var(--color-fg-2);
+        color: var(--color-fg-1);
     }
     &:hover,
     &:focus {
