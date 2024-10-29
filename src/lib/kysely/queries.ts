@@ -37,7 +37,7 @@ export async function getDocuments(companyIds: number[], type: DocumentType) {
     if (companyIds.length === 0) {
         return [];
     }
-    const invoices = await kysely
+    const documents = await kysely
         .selectFrom('public.documents')
         .select([
             'public.documents.id',
@@ -65,7 +65,7 @@ export async function getDocuments(companyIds: number[], type: DocumentType) {
         .groupBy('public.documents.id')
         .execute();
 
-    return invoices;
+    return documents;
 }
 
 export type Document = Awaited<ReturnType<typeof getDocuments>>[number];

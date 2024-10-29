@@ -1,6 +1,5 @@
 import {json} from '@sveltejs/kit';
 import {kysely} from '$lib/kysely/kysely';
-import {NewDocuments} from '$lib/kysely/gen/public/Documents';
 import {createValidator} from '$lib/schema/validate';
 
 const validatePOST = createValidator({
@@ -9,8 +8,8 @@ const validatePOST = createValidator({
     additionalProperties: false,
     properties: {
         name: {type: 'string'},
-        clientId: {type: 'string'},
-        companyId: {type: 'string'},
+        clientId: {type: 'number'},
+        companyId: {type: 'number'},
         emittedAt: {type: 'string'},
         lines: {
             type: 'array',
@@ -18,46 +17,41 @@ const validatePOST = createValidator({
                 type: 'object',
                 properties: {
                     description: {type: 'string'},
-                    price: {
-                        type: 'number',
-                    },
+                    price: {type: 'number'},
                 },
                 required: ['description', 'price'],
             },
         },
-        organisationId: {type: 'string'},
-        quantity_label: {type: 'string'},
+        organisationId: {type: 'number'},
+        quantityLabel: {type: 'string'},
+        quantityBase: {type: 'number'},
     },
-    required: ['clientId', 'companyId', 'emittedAt', 'lines', 'name', 'organisationId', 'quantity_label'],
+    required: ['clientId', 'companyId', 'emittedAt', 'lines', 'name', 'quantityLabel', 'quantityBase'],
 });
 
 export async function POST({request}) {
-    const contentType = request.headers.get('content-type');
-    if (request.headers.get('content-type') !== 'application/json') {
-        return json({error: `Content-Type: ${contentType} not handled, use "application/json" instead`}, {status: 400});
-    }
-    const data = (await request.json()) as Omit<NewDocuments, 'number' | 'status' | 'invoice'>;
+    const data = await request.json();
     if (!validatePOST(data)) {
         return json({error: validatePOST.errors}, {status: 400});
     }
-
-    const invoice = await kysely.transaction().execute(async trx => {
-        const {invoiceSequence} = await trx
+    const document = await kysely.transaction().execute(async trx => {
+        const {quoteSequence} = await trx
             .updateTable('public.companies')
-            .set(eb => ({invoiceSequence: eb('public.companies.invoiceSequence', '+', 1)}))
+            .set(eb => ({quoteSequence: eb('public.companies.quoteSequence', '+', 1)}))
             .where('id', '=', data.companyId)
-            .returning('invoiceSequence')
+            .returning('quoteSequence')
             .executeTakeFirstOrThrow();
         return await trx
             .insertInto('public.documents')
             .values({
                 ...data,
-                type: 'invoice',
-                number: invoiceSequence,
+                lines: JSON.stringify(data.lines),
+                type: 'quote',
+                number: quoteSequence - 1,
                 status: 'generated',
             })
             .returningAll()
             .executeTakeFirstOrThrow();
     });
-    return json(invoice);
+    return json(document);
 }

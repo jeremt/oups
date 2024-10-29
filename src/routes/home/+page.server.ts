@@ -11,7 +11,7 @@ export async function load({locals}) {
         companies,
         documents: await getDocuments(
             companies.map(c => c.id as number),
-            'invoice',
+            'quote',
         ),
     };
 }

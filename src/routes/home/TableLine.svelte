@@ -24,7 +24,7 @@
     async function handleStatusChange(event: Event) {
         const select = event.target as HTMLSelectElement;
         status = select.value as DocumentStatus;
-        await fetch(`/api/invoices/${document.id}`, {
+        await fetch(`/api/documents/${document.id}`, {
             method: 'PATCH',
             body: JSON.stringify({status}),
             headers: {

@@ -93,8 +93,17 @@
         width = w;
     }
 
-    function add() {
-        console.log(invoice);
+    async function add() {
+        const response = await fetch(`/api/documents`, {
+            method: 'POST',
+            body: JSON.stringify({...invoice, clientId: invoice.client.id, companyId: invoice.company.id}),
+            headers: {'Content-Type': 'application/json'},
+        });
+        if (response.status === 200) {
+            isOpen = false;
+        } else {
+            console.error(await response.json());
+        }
     }
 </script>
 
