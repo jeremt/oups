@@ -209,7 +209,7 @@
     </div>
 </Dialog>
 <SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (invoice.client = client)} />
-<SearchCompanyDialog bind:isOpen={isCompaniesOpen} onSelect={company => console.log(company)} {companies} />
+<SearchCompanyDialog bind:isOpen={isCompaniesOpen} onSelect={company => (invoice.company = company)} {companies} />
 
 <style>
     .editor {

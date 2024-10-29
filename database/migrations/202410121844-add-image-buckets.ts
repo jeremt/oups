@@ -1,7 +1,6 @@
 import {Kysely, sql} from 'kysely';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function up(db: Kysely<any>): Promise<void> {
+export async function up(db: Kysely<unknown>): Promise<void> {
     await db.executeQuery(sql`insert into "storage"."buckets" values ('users_avatars', 'users_avatars', null, now(), now(), true)`.compile(db));
     await db.executeQuery(sql`create policy "Allow insert for users_avatars bucket" on "storage"."objects" for insert with check (bucket_id = 'users_avatars')`.compile(db));
     await db.executeQuery(sql`create policy "Allow select for users_avatars bucket" on "storage"."objects" for select using (bucket_id = 'users_avatars')`.compile(db));
@@ -21,8 +20,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     await db.executeQuery(sql`create policy "Allow delete for companies_logos bucket" on "storage"."objects" for delete using (bucket_id = 'users_avatars')`.compile(db));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function down(db: Kysely<any>): Promise<void> {
+export async function down(db: Kysely<unknown>): Promise<void> {
     await db.executeQuery(sql`drop policy "Allow insert for users_avatars bucket" on "storage"."objects"`.compile(db));
     await db.executeQuery(sql`drop policy "Allow select for users_avatars bucket" on "storage"."objects"`.compile(db));
     await db.executeQuery(sql`drop policy "Allow update for users_avatars bucket" on "storage"."objects"`.compile(db));

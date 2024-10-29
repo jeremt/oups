@@ -1,5 +1,7 @@
 <script lang="ts">
     let {form} = $props();
+    let password = $state('');
+    let confirmPassword = $state('');
 </script>
 
 <svelte:head>
@@ -22,8 +24,10 @@
         <label for="email">Email</label>
         <input id="email" name="email" type="email" placeholder="picsou@disney.fr" autocomplete="email" value={form?.email} />
         <label for="password">Mot de passe</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" />
-        <button class="btn" type="submit" style:margin-top="0.5rem">Login</button>
+        <input bind:value={password} id="password" name="password" type="password" autocomplete="new-password" />
+        <label for="confirmPassword">Confirmer le mot de passe</label>
+        <input bind:value={confirmPassword} id="confirmPassword" name="password" type="password" autocomplete="new-password" />
+        <button disabled={password !== confirmPassword || password.length === 0} class="btn" type="submit" style:margin-top="0.5rem">Créer mon compte</button>
     </form>
 
     <div style:color="var(--color-error)">
@@ -34,7 +38,11 @@
             La connexion a échouée ({form.message}).
         {/if}
     </div>
-    <div>Pas de compte ? <a href="/auth/register">Rejoins nous</a></div>
+    <div>J'ai déjà un compte, <a href="/">me connecter</a></div>
+    <small style:max-width="20rem" style:color="var(--color-fg-2)" style:text-align="center">
+        Ce projet est (pour le moment) prévu pour un usage personnel, mais le code est <a href="https://github.com/jeremt/oups" target="_blank">open source</a>, donc vous pouvez
+        héberger vous-même une version du projet !
+    </small>
 </main>
 
 <style>

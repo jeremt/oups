@@ -1,22 +1,20 @@
 import * as path from 'path';
 import pg from 'pg';
 import {promises as fs} from 'fs';
-import {Kysely, Migrator, PostgresDialect, MigrationResult} from 'kysely';
+import {Kysely, Migrator, PostgresDialect, MigrationResult, CamelCasePlugin} from 'kysely';
 import {config} from 'dotenv';
 import {pathToFileURL} from 'url';
 
 config();
 
 const defaultMigrationContent = `
-import { Kysely } from 'kysely'
+import {Kysely} from 'kysely'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function up(db: Kysely<any>): Promise<void> {
+export async function up(db: Kysely<unknown>): Promise<void> {
   // Migration code
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function down(db: Kysely<any>): Promise<void> {
+export async function down(db: Kysely<unknown>): Promise<void> {
   // Migration code
 }
 `;
@@ -39,6 +37,7 @@ async function migrate() {
                 connectionString: process.env.DATABASE_URL,
             }),
         }),
+        plugins: [new CamelCasePlugin()],
     });
 
     const migrator = new Migrator({

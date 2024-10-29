@@ -5,9 +5,9 @@ export async function up(db: Kysely<unknown>): Promise<void> {
         .createTable('users')
         .ifNotExists()
         .addColumn('id', 'int8', col => col.generatedAlwaysAsIdentity().primaryKey())
-        .addColumn('created_at', 'timestamptz', col => col.defaultTo(sql`now()`).notNull())
-        .addColumn('updated_at', 'timestamptz', col => col.defaultTo(sql`now()`).notNull())
-        .addColumn('user_id', 'uuid', col => col.references('auth.users.id').onDelete('cascade'))
+        .addColumn('createdAt', 'timestamptz', col => col.defaultTo(sql`now()`).notNull())
+        .addColumn('updatedAt', 'timestamptz', col => col.defaultTo(sql`now()`).notNull())
+        .addColumn('userId', 'uuid', col => col.references('auth.users.id').onDelete('cascade'))
         .execute();
 
     await db.executeQuery(sql`create extension if not exists pg_cron;`.compile(db));

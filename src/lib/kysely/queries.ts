@@ -22,6 +22,8 @@ export async function getCompanies(user: ConnectedUser) {
             'public.companies.quoteSequence',
             'public.companies.siren',
             'public.companies.updatedAt',
+            'public.companies.email',
+            'public.companies.phone',
         ])
         .where('public.users.id', '=', user.id)
         .execute();

@@ -1,3 +1,4 @@
+import {kysely} from '$lib/kysely/kysely.js';
 import {fail, redirect} from '@sveltejs/kit';
 
 export const actions = {
@@ -10,10 +11,14 @@ export const actions = {
             return fail(400, {email, status: 'invalid', message: ''});
         }
 
-        const {error} = await locals.supabase.auth.signInWithPassword({email, password});
-        if (error) {
-            return fail(403, {email, status: 'login_failed', message: error?.message});
+        const user = await locals.getUser(); // needs to be called before signup
+
+        const {data, error} = await locals.supabase.auth.signUp({email, password});
+        if (error || data.user === null) {
+            return fail(403, {email, status: 'login_failed', message: error ? error?.message : 'User is null'});
         }
+
+        await kysely.updateTable('public.users').set({userId: data.user.id}).where('id', '=', user.id).execute();
 
         cookies.delete('anon_id', {path: '/', httpOnly: true, sameSite: 'lax'});
 
