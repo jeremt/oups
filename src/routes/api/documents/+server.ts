@@ -36,19 +36,19 @@ export async function POST({request}) {
         return json({error: validatePOST.errors}, {status: 400});
     }
     const {id} = await kysely.transaction().execute(async trx => {
-        const {quoteSequence} = await trx
+        const {invoiceSequence} = await trx
             .updateTable('public.companies')
-            .set(eb => ({quoteSequence: eb('public.companies.quoteSequence', '+', 1)}))
+            .set(eb => ({invoiceSequence: eb('public.companies.invoiceSequence', '+', 1)}))
             .where('id', '=', data.companyId)
-            .returning('quoteSequence')
+            .returning('invoiceSequence')
             .executeTakeFirstOrThrow();
         return await trx
             .insertInto('public.documents')
             .values({
                 ...data,
                 lines: JSON.stringify(data.lines),
-                type: 'quote',
-                number: quoteSequence - 1,
+                type: 'invoice',
+                number: invoiceSequence - 1,
                 status: 'generated',
             })
             .returning('public.documents.id')
