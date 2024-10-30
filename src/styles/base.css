@@ -39,6 +39,7 @@ input[type='text']:not(.invisible),
 input[type='password']:not(.invisible),
 input[type='email']:not(.invisible),
 input[type='number']:not(.invisible),
+input[type='phone']:not(.invisible),
 textarea:not(.invisible) {
     padding: 0.5em;
     font-family: var(--font-brand);

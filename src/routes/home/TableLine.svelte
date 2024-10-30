@@ -13,7 +13,7 @@
 
 <tr>
     <td class="name">{document.name} nº{document.number}</td>
-    <StatusPicker {document} />
+    <td><StatusPicker {document} /></td>
     <td>{formatDate(new Date(document.emittedAt))}</td>
     <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)} €</td>
     <td>{document.company.name}</td>
