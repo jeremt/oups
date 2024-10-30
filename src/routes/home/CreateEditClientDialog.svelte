@@ -1,11 +1,20 @@
+<script module>
+    const defaultClient: NewClients = {
+        name: '',
+        address: '',
+        email: '',
+        logoUrl: '',
+        companyId: 1,
+    };
+</script>
+
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
-    import type {Clients} from '$lib/kysely/gen/public/Clients';
+    import type {Clients, NewClients} from '$lib/kysely/gen/public/Clients';
     import type {Companies} from '$lib/kysely/gen/public/Companies';
     import Dialog from '$lib/widgets/Dialog.svelte';
     import ResizeInput from '$lib/widgets/ResizeInput.svelte';
     import EnhancedSelect, {type Option} from '$lib/widgets/EnhancedSelect.svelte';
-    import {onMount} from 'svelte';
 
     type Props = {
         isOpen: boolean;
@@ -14,25 +23,14 @@
 
     let {isOpen = $bindable(false), selectedClient = $bindable(undefined)}: Props = $props();
     let error = $state('');
-    let companyIdSelected = $state<number>();
     let options = $state<Option[]>([]);
 
-    let client = $derived(
-        selectedClient ?? {
-            name: '',
-            address: '',
-            email: '',
-            logoUrl: '',
-        },
-    );
+    let client = $state<NewClients>(selectedClient ?? defaultClient);
 
     async function createClient() {
         const response = await fetch(`/api/clients`, {
             method: 'POST',
-            body: JSON.stringify({
-                ...client,
-                companyId: companyIdSelected,
-            }),
+            body: JSON.stringify(client),
         });
         if (response.status === 200) {
             isOpen = false;
@@ -43,10 +41,7 @@
     async function editClient() {
         const response = await fetch(`/api/clients/${selectedClient!.id}`, {
             method: 'PATCH',
-            body: JSON.stringify({
-                ...client,
-                companyId: companyIdSelected,
-            }),
+            body: JSON.stringify(client),
         });
         if (response.status === 200) {
             isOpen = false;
@@ -55,14 +50,21 @@
         }
     }
 
-    onMount(async () => {
-        const response = await fetch(`/api/companies`);
-        if (response.status === 200) {
-            const companies: Companies[] = await response.json();
-            options = companies.map(c => ({id: c.id as number, image: c.logoUrl ?? '', label: c.name}));
-        } else {
-            error = (await response.json())?.message;
-        }
+    $effect(() => {
+        (async () => {
+            const response = await fetch(`/api/companies`);
+            if (response.status === 200) {
+                const companies: Companies[] = await response.json();
+                options = companies.map(c => ({id: c.id as number, image: c.logoUrl ?? '', label: c.name}));
+                client.companyId = companies[0]?.id;
+            } else {
+                error = (await response.json())?.message;
+            }
+        })();
+    });
+
+    $effect(() => {
+        client = selectedClient ?? defaultClient;
     });
 </script>
 
@@ -84,7 +86,7 @@
         <input type="email" placeholder="Adresse email" bind:value={client.email} />
         <ResizeInput placeholder="Adresse" bind:value={client.address} />
         <input type="text" placeholder="URL du logo" bind:value={client.logoUrl} />
-        <EnhancedSelect bind:value={companyIdSelected} {options} placeholder="Entreprise" />
+        <EnhancedSelect bind:value={client.companyId} {options} placeholder="Entreprise" />
     </div>
     {#if error}
         <div class="error">

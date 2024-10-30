@@ -1,3 +1,16 @@
+<script module>
+    const defaultCompany: NewCompanies = {
+        name: '',
+        bic: '',
+        iban: '',
+        siren: '',
+        address: '',
+        phone: '',
+        email: '',
+        logoUrl: '',
+    };
+</script>
+
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
@@ -13,25 +26,12 @@
     let {isOpen = $bindable(false), selected = $bindable(undefined)}: Props = $props();
     let error = $state('');
 
-    let company = $derived<NewCompanies>(
-        selected ?? {
-            name: '',
-            bic: '',
-            iban: '',
-            siren: '',
-            address: '',
-            phone: '',
-            email: '',
-            logoUrl: '',
-        },
-    );
+    let company = $state<NewCompanies>(selected ?? defaultCompany);
 
     async function create() {
         const response = await fetch(`/api/companies`, {
             method: 'POST',
-            body: JSON.stringify({
-                ...company,
-            }),
+            body: JSON.stringify(company),
         });
         if (response.status === 200) {
             isOpen = false;
@@ -42,9 +42,7 @@
     async function edit() {
         const response = await fetch(`/api/companies/${selected!.id}`, {
             method: 'PATCH',
-            body: JSON.stringify({
-                ...company,
-            }),
+            body: JSON.stringify(company),
         });
         if (response.status === 200) {
             isOpen = false;
@@ -52,6 +50,10 @@
             error = (await response.json())?.message;
         }
     }
+
+    $effect(() => {
+        company = selected ?? defaultCompany;
+    });
 </script>
 
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
