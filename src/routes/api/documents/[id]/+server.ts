@@ -9,8 +9,8 @@ const validatePATCH = createValidator({
     additionalProperties: false,
     properties: {
         status: {type: 'string', enum: ['generated', 'sent', 'paid', 'declared']},
-        companyId: {type: 'string'},
-        clientId: {type: 'string'},
+        companyId: {type: 'number'},
+        clientId: {type: 'number'},
         organizationId: {type: 'string'},
         emittedAt: {type: 'string'},
         name: {type: 'string'},
@@ -31,7 +31,7 @@ const validatePATCH = createValidator({
         },
         quantity_label: {type: 'string'},
     },
-    required: ['name', 'status', 'emissionDate'],
+    required: ['name', 'status', 'emittedAt'],
 });
 
 export async function PATCH({params, request}) {
