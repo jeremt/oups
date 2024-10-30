@@ -5,7 +5,7 @@ import {Companies} from '$lib/kysely/gen/public/Companies';
 import {sql} from 'kysely';
 import {Clients} from '$lib/kysely/gen/public/Clients';
 
-const validatePATCH = createValidator({
+const validatePUT = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
@@ -13,7 +13,7 @@ const validatePATCH = createValidator({
         status: {type: 'string', enum: ['generated', 'sent', 'paid', 'declared'] as const},
         companyId: {type: 'number'},
         clientId: {type: 'number'},
-        organizationId: {type: 'number'},
+        organizationId: {anyOf: [{type: 'number'}, {type: 'null'}]},
         emittedAt: {type: 'string'},
         name: {type: 'string'},
         lines: {
@@ -36,12 +36,17 @@ const validatePATCH = createValidator({
     required: ['name', 'status', 'emittedAt'],
 });
 
-export async function PATCH({params, request}) {
+export async function PUT({params, request}) {
     const data = await request.json(); // cast in necessary because status enum is not properly infered
-    if (!validatePATCH(data)) {
-        return json({error: validatePATCH.errors}, {status: 400});
+    if (!validatePUT(data)) {
+        return json({error: validatePUT.errors}, {status: 400});
     }
-    const invoice = await kysely.updateTable('public.documents').set(data).where('id', '=', parseInt(params.id)).returningAll().executeTakeFirst();
+    const invoice = await kysely
+        .updateTable('public.documents')
+        .set({...data, lines: JSON.stringify(data.lines)})
+        .where('id', '=', parseInt(params.id))
+        .returningAll()
+        .executeTakeFirst();
 
     return json(invoice);
 }

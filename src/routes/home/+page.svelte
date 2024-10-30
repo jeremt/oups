@@ -6,16 +6,15 @@
     let {data} = $props();
 
     let documents = $state(data.documents);
+    let selected = $state.raw<(typeof documents)[number]>();
+
     let isDocumentOpen = $state(false);
 
-    async function onDocumentAdded(documentId: number) {
-        const response = await fetch(`/api/documents/${documentId}`);
-        if (response.status === 200) {
-            documents.push(await response.json());
-        } else {
-            console.error(await response.json());
+    $effect(() => {
+        if (!isDocumentOpen) {
+            selected = undefined;
         }
-    }
+    });
 </script>
 
 <svelte:head>
@@ -56,11 +55,26 @@
         </thead>
         <tbody>
             {#each documents as document}
-                <TableLine {document} />
+                <TableLine
+                    {document}
+                    onSelect={() => {
+                        selected = document;
+                        isDocumentOpen = true;
+                    }}
+                />
             {/each}
         </tbody>
     </table>
-    <DocumentDialog bind:isOpen={isDocumentOpen} bind:companies={data.companies} {onDocumentAdded} />
+    <DocumentDialog
+        {selected}
+        bind:isOpen={isDocumentOpen}
+        bind:companies={data.companies}
+        onCreated={document => documents.push(document)}
+        onEdited={document => {
+            documents = documents.map(d => (d.id === document.id ? document : d));
+            selected = undefined;
+        }}
+    />
 </main>
 
 <style>

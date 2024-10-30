@@ -50,4 +50,8 @@ export interface JsonSchemaBoolean extends JsonSchemaAll<boolean> {
     type: 'boolean';
 }
 
-export type JsonSchema = JsonSchemaAnyOf | JsonSchemaAny | JsonSchemaArray | JsonSchemaObject | JsonSchemaNumber | JsonSchemaString | JsonSchemaBoolean;
+export interface JsonSchemaNull extends JsonSchemaAll<null> {
+    type: 'null';
+}
+
+export type JsonSchema = JsonSchemaAnyOf | JsonSchemaAny | JsonSchemaArray | JsonSchemaObject | JsonSchemaNumber | JsonSchemaString | JsonSchemaBoolean | JsonSchemaNull;

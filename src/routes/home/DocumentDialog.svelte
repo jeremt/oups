@@ -6,109 +6,124 @@
     import ResizeInput from '$lib/widgets/ResizeInput.svelte';
     import SearchClientDialog from './SearchClientDialog.svelte';
     import SearchCompanyDialog from './SearchCompanyDialog.svelte';
-    import type {Company} from '$lib/kysely/queries';
+    import {formatDateForInput} from '$lib/helpers/formatDate';
     import type {Clients} from '$lib/kysely/gen/public/Clients';
-    import type {Documents} from '$lib/kysely/gen/public/Documents';
     import type {Companies} from '$lib/kysely/gen/public/Companies';
     import type {DocumentLine} from '$lib/kysely/types';
+    import type {NewDocuments} from '$lib/kysely/gen/public/Documents';
+    import type {Company, Document} from '$lib/kysely/queries';
 
     type Props = {
         isOpen: boolean;
+        selected?: Document;
         companies: Company[];
-        onDocumentAdded: (documentId: number) => void;
+        onCreated: (document: Document) => void;
+        onEdited: (document: Document) => void;
     };
-    let {isOpen = $bindable(false), companies = $bindable(), onDocumentAdded}: Props = $props();
+    let {isOpen = $bindable(false), companies = $bindable(), selected, onEdited, onCreated}: Props = $props();
+
+    type NewDocument = Omit<NewDocuments, 'createdAt' | 'updatedAt'> & {companyId?: number; company?: Companies; clientId?: number; client?: Clients; emittedAt: string};
 
     let isClientsOpen = $state(false);
     let isCompaniesOpen = $state(false);
-    let mode = $state<'add' | 'edit'>('add');
-    let document = $state<Omit<Documents, 'emittedAt'> & {company: Companies; client: Clients; emittedAt: string}>({
-        id: 1,
-        clientId: 1,
-        organizationId: null,
-        companyId: companies[0]?.id ?? 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        emittedAt: new Date().toISOString(),
-        lines: [
-            {price: 3200, description: 'Encadrement'},
-            {price: 150, description: 'Réunions'},
-            {price: 540, description: 'Mentorats'},
-            {
-                price: 12000,
-                description: `Un truc un peu compliqué :
-- qui doit être sur plusieurs lignes
-- pour tout expliquer dans le détail
-- ça passe en vrai`,
-            },
-            {price: 540, description: 'Mentorats'},
-        ],
-        name: 'Encadrement',
-        number: 15,
-        status: 'generated',
-        note: '',
-        type: 'invoice',
-        quantityBase: 600,
-        quantityLabel: 'Jours',
-        client: {
-            id: 1,
-            companyId: 1,
-            createdAt: new Date(),
-            name: 'Ada Tech School',
-            address: '28 rue du Petit Musc\n75004 Paris',
-            updatedAt: new Date(),
-            logoUrl: null,
-            email: null,
-        },
-        company: companies[0] ?? {
-            id: 1,
-            quoteSequence: 14,
-            invoiceSequence: 1,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            name: 'M JÉRÉMIE TABOADA ALVAREZ',
-            address: '11 rue de Pommard\n75012 Paris',
-            bic: 'AGRIFRPP882',
-            iban: 'FR76 1820 6000 5165 0085 3209 021',
-            siren: '853 291 268',
-            logoUrl: null,
-            email: 'test@test.com',
-            phone: '0624912244',
-        },
-    });
+    let document = $state<NewDocument>(
+        selected
+            ? {...selected, emittedAt: selected.emittedAt.toISOString()}
+            : {
+                  clientId: 0,
+                  companyId: 0,
+                  emittedAt: formatDateForInput(new Date()),
+                  name: '',
+                  number: 0,
+                  quantityBase: 0,
+                  quantityLabel: '',
+                  status: 'generated',
+                  type: 'invoice',
+                  lines: [],
+                  note: '',
+              },
+    );
     let newLine = $state<DocumentLine>({description: '', price: 0});
+
     function addOrRemoveLine(line: DocumentLine, index: number) {
         if (index === -1 && line.description.length > 0 && line.price > 0) {
-            (document.lines as DocumentLine[]).push({...line});
+            (document?.lines as DocumentLine[]).push({...line});
             newLine = {description: '', price: 0};
         } else if (index !== -1 && line.description.length === 0 && !line.price) {
-            (document.lines as DocumentLine[]).splice(index, 1);
+            (document?.lines as DocumentLine[]).splice(index, 1);
         }
     }
 
     const aspectRatio = 595.28 / 841.89;
     let width = $state(0);
-    let height = $derived(width / aspectRatio);
-    let ratio = $derived(width / 595.28);
+    const height = $derived(width / aspectRatio);
+    const ratio = $derived(width / 595.28);
     function onResize(w: number, h: number) {
         width = w;
     }
+    const disabled = $derived(document.name === '' || !document.clientId || !document.companyId);
 
     async function add() {
         const response = await fetch(`/api/documents`, {
             method: 'POST',
-            body: JSON.stringify({...document, clientId: document.client.id, companyId: document.company.id}),
+            body: JSON.stringify(document),
             headers: {'Content-Type': 'application/json'},
         });
         if (response.status === 200) {
             const {id: documentId} = await response.json();
-            console.log(documentId);
-            onDocumentAdded(documentId);
+            const document = await (await fetch(`/api/documents/${documentId}`)).json();
+            onCreated(document);
             isOpen = false;
         } else {
             console.error(await response.json());
         }
     }
+
+    async function edit() {
+        const response = await fetch(`/api/documents/${selected!.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(document),
+            headers: {'Content-Type': 'application/json'},
+        });
+        if (response.status === 200) {
+            const {id: documentId} = await response.json();
+            const document = await (await fetch(`/api/documents/${documentId}`)).json();
+            onEdited(document);
+            isOpen = false;
+        } else {
+            console.error(await response.json());
+        }
+    }
+
+    $effect(() => {
+        (async () => {
+            if (isOpen && !selected) {
+                const response = await fetch(`/api/documents/new`);
+                if (response.status === 200) {
+                    const {client, invoiceSequence} = (await response.json()) as {client: Clients; invoiceSequence: number; quoteSequence: number};
+                    document = {
+                        number: invoiceSequence,
+                        client,
+                        clientId: client?.id,
+                        company: companies[0],
+                        companyId: companies[0]?.id,
+                        emittedAt: formatDateForInput(new Date()),
+                        name: '',
+                        quantityBase: 600,
+                        quantityLabel: 'jour',
+                        status: 'generated',
+                        type: 'invoice',
+                        lines: [],
+                        note: '',
+                    };
+                } else {
+                    console.error(await response.json());
+                }
+            } else if (isOpen && selected) {
+                document = {...selected, emittedAt: formatDateForInput(selected.emittedAt)};
+            }
+        })();
+    });
 </script>
 
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
@@ -118,12 +133,14 @@
                 <Cross />
             </button>
             <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Télécharger</a>
-            {#if mode === 'add'}
-                <button class="btn" onclick={add}>Créer</button>
+            {#if selected}
+                <button class="btn" onclick={edit} {disabled}>Editer</button>
+            {:else}
+                <button class="btn" onclick={add} {disabled}>Créer</button>
             {/if}
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
-            {#if document.company}
+            {#if document?.company}
                 {@const company = document.company}
                 <div
                     class="company"
@@ -142,9 +159,9 @@
                     {#if company.email}<div class="email">{company.email}</div>{/if}
                     {#if company.siren}<div>SIREN : {company.siren}</div>{/if}
                 </div>
-                <div class="date">Date d'émission : <input type="date" class="invisible" value={document.emittedAt} /></div>
+                <div class="date">Date d'émission : <input type="date" class="invisible" bind:value={document.emittedAt} /></div>
             {/if}
-            {#if document.clientId}
+            {#if document?.clientId}
                 {@const client = document.client}
                 <div
                     class="client"
@@ -157,9 +174,9 @@
                         }
                     }}
                 >
-                    {#if client.name}<div class="name">{client.name}</div>{/if}
-                    {#if client.email}<div>{client.email}</div>{/if}
-                    {#if client.address}<div>{client.address}</div>{/if}
+                    {#if client?.name}<div class="name">{client.name}</div>{/if}
+                    {#if client?.email}<div>{client.email}</div>{/if}
+                    {#if client?.address}<div>{client.address}</div>{/if}
                 </div>
             {/if}
             <div class="infos">
@@ -217,7 +234,7 @@
                     Total (HT) : {(document.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €
                 </div>
                 <div style:text-align="right">TVA Non applicable</div>
-                {#if document.companyId}
+                {#if document.company}
                     {@const company = document.company}
                     <div class="payment-title">Informations de paiement</div>
                     <div class="payment-infos">BIC : {company.bic}<br />IBAN : {company.iban}</div>

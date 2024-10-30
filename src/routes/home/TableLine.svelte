@@ -7,8 +7,9 @@
 
     type Props = {
         document: Document;
+        onSelect: (document: Document) => void;
     };
-    let {document}: Props = $props();
+    let {document, onSelect}: Props = $props();
 </script>
 
 <tr>
@@ -18,7 +19,7 @@
     <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)} €</td>
     <td>{document.company.name}</td>
     <td class="note">{@html document.note}</td>
-    <td><button class="icon button" aria-label="Éditer"><Pen /></button></td>
+    <td><button class="icon button" aria-label="Éditer" onclick={() => onSelect(document)}><Pen /></button></td>
 </tr>
 
 <style>

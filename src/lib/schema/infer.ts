@@ -1,4 +1,4 @@
-import type {JsonSchema, JsonSchemaAny, JsonSchemaAnyOf, JsonSchemaArray, JsonSchemaNumber, JsonSchemaObject, JsonSchemaString, JsonSchemaBoolean} from './schema';
+import type {JsonSchema, JsonSchemaAny, JsonSchemaAnyOf, JsonSchemaArray, JsonSchemaNumber, JsonSchemaObject, JsonSchemaString, JsonSchemaBoolean, JsonSchemaNull} from './schema';
 
 type Const<T extends JsonSchema, Fallback> = T['const'] extends infer C extends object ? C : Fallback;
 type MapObject<T extends JsonSchemaObject> =
@@ -17,6 +17,7 @@ type InferJsonSchemaObject<T extends JsonSchemaObject> = Const<T, MapObject<T>>;
 type InferJsonSchemaNumber<T extends JsonSchemaNumber> = Const<T, number>;
 type InferJsonSchemaString<T extends JsonSchemaString> = Const<T, T['enum'] extends (infer E)[] ? E : string>;
 type InferJsonSchemaBoolean<T extends JsonSchemaBoolean> = Const<T, boolean>;
+type InferJsonSchemaNull<T extends JsonSchemaNull> = Const<T, null>;
 
 export type InferJsonSchema<T extends JsonSchema> = T extends JsonSchemaAny
     ? InferJsonSchemaAny<T>
@@ -32,6 +33,8 @@ export type InferJsonSchema<T extends JsonSchema> = T extends JsonSchemaAny
               ? InferJsonSchemaArray<T>
               : T extends JsonSchemaObject
                 ? InferJsonSchemaObject<T>
-                : never;
+                : T extends JsonSchemaNull
+                  ? InferJsonSchemaNull<T>
+                  : never;
 
 export type InferJsonSchemaRecord<T extends Record<string, JsonSchema>> = {[K in keyof T]: InferJsonSchema<T[K]>};
