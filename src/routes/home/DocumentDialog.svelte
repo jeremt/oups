@@ -9,9 +9,8 @@
     import {formatDateForInput} from '$lib/helpers/formatDate';
     import type {Clients} from '$lib/kysely/gen/public/Clients';
     import type {Companies} from '$lib/kysely/gen/public/Companies';
-    import type {DocumentLine} from '$lib/kysely/types';
-    import type {NewDocuments} from '$lib/kysely/gen/public/Documents';
     import type {Company, Document} from '$lib/kysely/queries';
+    import type {NewDocuments, PublicDocumentsLines} from '$lib/kysely/gen/public/Documents';
 
     type Props = {
         isOpen: boolean;
@@ -46,14 +45,14 @@
               },
     );
 
-    let newLine = $state<DocumentLine>({description: '', price: 0});
+    let newLine = $state<PublicDocumentsLines[number]>({description: '', price: 0});
 
-    function addOrRemoveLine(line: DocumentLine, index: number) {
+    function addOrRemoveLine(line: PublicDocumentsLines[number], index: number) {
         if (index === -1 && line.description.length > 0 && line.price > 0) {
-            (document?.lines as DocumentLine[]).push({...line});
+            (document?.lines as PublicDocumentsLines).push({...line});
             newLine = {description: '', price: 0};
         } else if (index !== -1 && line.description.length === 0 && !line.price) {
-            (document?.lines as DocumentLine[]).splice(index, 1);
+            (document?.lines as PublicDocumentsLines).splice(index, 1);
         }
     }
 
@@ -66,7 +65,7 @@
     }
     const disabled = $derived(document.name === '' || !document.clientId || !document.companyId);
 
-    async function add() {
+    async function create() {
         const response = await fetch(`/api/documents`, {
             method: 'POST',
             body: JSON.stringify(document),
@@ -132,14 +131,14 @@
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
     <div class="editor">
         <header>
-            <button aria-label="Retour" class="icon" onclick={() => (isOpen = false)}>
+            <button aria-label="Retour" class="icon" style:margin-right="auto" onclick={() => (isOpen = false)}>
                 <Cross />
             </button>
-            <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Télécharger</a>
             {#if selected}
+                <a role="button" href="/api/documents/{selected.id}/pdf">Télécharger</a>
                 <button class="btn" onclick={edit} {disabled}>Editer</button>
             {:else}
-                <button class="btn" onclick={add} {disabled}>Créer</button>
+                <button class="btn" onclick={create} {disabled}>Créer</button>
             {/if}
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
@@ -192,7 +191,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#each document.lines as DocumentLine[] as line, i}
+                        {#each document.lines as PublicDocumentsLines as line, i}
                             <tr>
                                 <td>
                                     <ResizeInput
@@ -209,7 +208,7 @@
                                     </div>
                                 </td>
                                 <td style:padding="0" style:border="none" style:width="{10 * ratio}px"
-                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => (document.lines as DocumentLine[]).splice(i, 1)}
+                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => (document.lines as PublicDocumentsLines).splice(i, 1)}
                                         ><Trash --size="{ratio * 12}px" /></button
                                     ></td
                                 >
@@ -234,7 +233,7 @@
                     </tbody>
                 </table>
                 <div style:font-weight="bold" style:text-align="right" style:margin-top="{20 * ratio}px">
-                    Total (HT) : {(document.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €
+                    Total (HT) : {(document.lines as PublicDocumentsLines).reduce((total, line) => total + line.price, 0)} €
                 </div>
                 <div style:text-align="right">TVA Non applicable</div>
                 {#if document.company}

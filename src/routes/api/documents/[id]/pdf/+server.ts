@@ -1,11 +1,12 @@
+import {sql} from 'kysely';
 import {read} from '$app/server';
+import {error} from '@sveltejs/kit';
 import fontkit from '@pdf-lib/fontkit';
+import {kysely} from '$lib/kysely/kysely';
 import {formatDate} from '$lib/helpers/formatDate';
 import {grayscale, PDFDocument, PDFFont} from 'pdf-lib';
 import type {Clients} from '$lib/kysely/gen/public/Clients';
-import type {Documents} from '$lib/kysely/gen/public/Documents';
 import type {Companies} from '$lib/kysely/gen/public/Companies';
-import type {DocumentLine} from '$lib/kysely/types';
 
 import BricolageGrotesque from './fonts/BricolageGrotesque-Regular.ttf';
 import BricolageGrotesqueBold from './fonts/BricolageGrotesque-Bold.ttf';
@@ -13,61 +14,37 @@ import BricolageGrotesqueBold from './fonts/BricolageGrotesque-Bold.ttf';
 const pageMargin = 50;
 const lineHeight = 20;
 
-export async function GET() {
-    const invoice: Documents & {company: Companies; client: Clients} = {
-        id: 1,
-        clientId: 1,
-        organizationId: null,
-        companyId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        emittedAt: new Date(),
-        lines: [
-            {price: 3200, description: 'Encadrement'},
-            {price: 150, description: 'Réunions'},
-            {price: 540, description: 'Mentorats'},
-            {
-                price: 12000,
-                description: `Un truc un peu compliqué :
-- qui doit être sur plusieurs lignes
-- pour tout expliquer dans le détail
-- ça passe en vrai`,
-            },
-            {price: 540, description: 'Mentorats'},
-        ],
-        name: 'Encadrement',
-        number: 15,
-        status: 'generated',
-        note: '',
-        type: 'invoice',
-        quantityBase: 600,
-        quantityLabel: 'jour',
-        client: {
-            id: 1,
-            companyId: 1,
-            createdAt: new Date(),
-            name: 'Ada Tech School',
-            address: '28 rue du Petit Musc\n75004 Paris',
-            updatedAt: new Date(),
-            logoUrl: null,
-            email: null,
-        },
-        company: {
-            id: 1,
-            quoteSequence: 14,
-            invoiceSequence: 1,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            name: 'M JÉRÉMIE TABOADA ALVAREZ',
-            address: '11 rue de Pommard\n75012 Paris',
-            bic: 'AGRIFRPP882',
-            iban: 'FR76 1820 6000 5165 0085 3209 021',
-            siren: '853 291 268',
-            email: 'taboada.jeremie@gmail.com',
-            phone: '06 24 91 22 44',
-            logoUrl: null,
-        },
-    };
+export async function GET({params}) {
+    const document = await kysely
+        .selectFrom('public.documents')
+        .select([
+            'public.documents.id',
+            'public.documents.status',
+            'public.documents.lines',
+            'public.documents.name',
+            'public.documents.note',
+            'public.documents.number',
+            'public.documents.emittedAt',
+            'public.documents.quantityBase',
+            'public.documents.quantityLabel',
+            'public.documents.organizationId',
+            'public.documents.type',
+            'public.documents.createdAt',
+            'public.documents.updatedAt',
+            'public.documents.companyId',
+            'public.documents.clientId',
+            sql<Companies>`json_agg(companies)->0`.as('company'),
+            sql<Clients>`json_agg(clients)->0`.as('client'),
+        ])
+        .leftJoin('public.companies', 'public.companies.id', 'public.documents.companyId')
+        .leftJoin('public.clients', 'public.clients.id', 'public.documents.clientId')
+        .where('public.documents.id', '=', parseInt(params.id))
+        .groupBy('public.documents.id')
+        .executeTakeFirst();
+
+    if (document === undefined) {
+        throw error(404, `This document doesn't exist`);
+    }
 
     const pdf = await PDFDocument.create();
     pdf.registerFontkit(fontkit);
@@ -78,7 +55,7 @@ export async function GET() {
     const page = pdf.addPage();
 
     // company
-    const company = invoice.company;
+    const company = document.company;
     page.moveTo(pageMargin, page.getHeight() - pageMargin);
     page.drawText(company.name, {font: fontBold, size: 12});
     page.moveDown(lineHeight);
@@ -98,10 +75,10 @@ export async function GET() {
     page.moveDown(lineHeight / 2);
     page.drawText(`SIREN : ${company.siren}`, {font, size: 12});
     page.moveDown(lineHeight);
-    page.drawText(`Date d'émission : ${formatDate(invoice.emittedAt)}`, {font, size: 12});
+    page.drawText(`Date d'émission : ${formatDate(document.emittedAt)}`, {font, size: 12});
 
     // client
-    const client = invoice.client;
+    const client = document.client;
 
     page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(client.name, 12) - pageMargin, page.getHeight() - 150);
     page.drawText(client.name, {font: fontBold, size: 12});
@@ -113,7 +90,7 @@ export async function GET() {
     }
 
     // infos
-    const title = `Facture nº${invoice.number} : ${invoice.name}`;
+    const title = `Facture nº${document.number} : ${document.name}`;
     page.moveTo(50, page.getHeight() - 260);
     page.drawText(title, {font: fontBold, size: 20});
 
@@ -151,7 +128,7 @@ export async function GET() {
     });
 
     y -= rowHeight;
-    for (const {price, description} of invoice.lines as DocumentLine[]) {
+    for (const {price, description} of document.lines) {
         const lineCount = description.split('\n').length;
         page.drawRectangle({
             x: pageMargin,
@@ -187,7 +164,7 @@ export async function GET() {
         y -= rowHeight * lineCount;
     }
 
-    const totalText = `Total (HT) : ${(invoice.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €`;
+    const totalText = `Total (HT) : ${document.lines.reduce((total, line) => total + line.price, 0)} €`;
     page.moveTo(page.getWidth() - fontBold.widthOfTextAtSize(totalText, 12) - pageMargin, y);
     page.drawText(totalText, {font: fontBold, size: 12});
     page.moveTo(page.getWidth() - font.widthOfTextAtSize('TVA Non applicable', 12) - pageMargin, y - lineHeight);
@@ -207,7 +184,7 @@ export async function GET() {
         headers: {
             'Content-Type': 'application/pdf',
             'Content-Length': bytes.byteLength.toString(),
-            'Content-Disposition': `attachment; filename="facture-n${invoice.number}-${invoice.name.replace(' ', '-').toLowerCase()}.pdf"`,
+            'Content-Disposition': `attachment; filename="facture-n${document.number}-${document.name.replace(' ', '-').toLowerCase()}.pdf"`,
         },
     });
 }
