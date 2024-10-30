@@ -1,17 +1,16 @@
 import {json} from '@sveltejs/kit';
 import {kysely} from '$lib/kysely/kysely';
 import {createValidator} from '$lib/schema/validate';
-import type {DocumentsUpdate} from '$lib/kysely/gen/public/Documents';
 
 const validatePATCH = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
     additionalProperties: false,
     properties: {
-        status: {type: 'string', enum: ['generated', 'sent', 'paid', 'declared']},
+        status: {type: 'string', enum: ['generated', 'sent', 'paid', 'declared'] as const},
         companyId: {type: 'number'},
         clientId: {type: 'number'},
-        organizationId: {type: 'string'},
+        organizationId: {type: 'number'},
         emittedAt: {type: 'string'},
         name: {type: 'string'},
         lines: {
@@ -35,7 +34,7 @@ const validatePATCH = createValidator({
 });
 
 export async function PATCH({params, request}) {
-    const data = (await request.json()) as DocumentsUpdate; // cast in necessary because status enum is not properly infered
+    const data = await request.json(); // cast in necessary because status enum is not properly infered
     if (!validatePATCH(data)) {
         return json({error: validatePATCH.errors}, {status: 400});
     }
