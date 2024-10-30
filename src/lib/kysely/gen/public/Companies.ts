@@ -7,7 +7,7 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 export type PublicCompaniesId = number;
 
 /** Represents the table public.companies */
-export default interface CompaniesTable {
+export interface CompaniesTable {
   id: ColumnType<PublicCompaniesId, never, never>;
 
   createdAt: ColumnType<Date, Date | string | undefined, Date | string>;

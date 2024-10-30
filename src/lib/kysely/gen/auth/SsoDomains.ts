@@ -11,7 +11,7 @@ export type AuthSsoDomainsId = string;
  * Represents the table auth.sso_domains
  * Auth: Manages SSO email address domain mapping to an SSO Identity Provider.
  */
-export default interface SsoDomainsTable {
+export interface SsoDomainsTable {
   id: ColumnType<AuthSsoDomainsId, AuthSsoDomainsId, AuthSsoDomainsId>;
 
   ssoProviderId: ColumnType<AuthSsoProvidersId, AuthSsoProvidersId, AuthSsoProvidersId>;

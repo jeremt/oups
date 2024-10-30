@@ -11,7 +11,7 @@ export type AuthRefreshTokensId = number;
  * Represents the table auth.refresh_tokens
  * Auth: Store of tokens used to refresh JWT tokens once they expire.
  */
-export default interface RefreshTokensTable {
+export interface RefreshTokensTable {
   id: ColumnType<AuthRefreshTokensId, AuthRefreshTokensId | undefined, AuthRefreshTokensId>;
 
   instanceId: ColumnType<string | null, string | null, string | null>;

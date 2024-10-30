@@ -11,7 +11,7 @@ export type AuthMfaChallengesId = string;
  * Represents the table auth.mfa_challenges
  * auth: stores metadata about challenge requests made
  */
-export default interface MfaChallengesTable {
+export interface MfaChallengesTable {
   id: ColumnType<AuthMfaChallengesId, AuthMfaChallengesId, AuthMfaChallengesId>;
 
   factorId: ColumnType<AuthMfaFactorsId, AuthMfaFactorsId, AuthMfaFactorsId>;

@@ -11,7 +11,7 @@ export type AuthSamlProvidersId = string;
  * Represents the table auth.saml_providers
  * Auth: Manages SAML Identity Provider connections.
  */
-export default interface SamlProvidersTable {
+export interface SamlProvidersTable {
   id: ColumnType<AuthSamlProvidersId, AuthSamlProvidersId, AuthSamlProvidersId>;
 
   ssoProviderId: ColumnType<AuthSsoProvidersId, AuthSsoProvidersId, AuthSsoProvidersId>;

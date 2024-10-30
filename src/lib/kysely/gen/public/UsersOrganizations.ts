@@ -6,7 +6,7 @@ import type { PublicOrganizationsId } from './Organizations';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 /** Represents the table public.users_organizations */
-export default interface UsersOrganizationsTable {
+export interface UsersOrganizationsTable {
   userId: ColumnType<PublicUsersId, PublicUsersId, PublicUsersId>;
 
   organizationId: ColumnType<PublicOrganizationsId, PublicOrganizationsId, PublicOrganizationsId>;

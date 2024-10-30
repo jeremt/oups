@@ -9,7 +9,7 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 export type PublicUsersId = number;
 
 /** Represents the table public.users */
-export default interface UsersTable {
+export interface UsersTable {
   id: ColumnType<PublicUsersId, never, never>;
 
   createdAt: ColumnType<Date, Date | string | undefined, Date | string>;

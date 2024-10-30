@@ -10,7 +10,7 @@ export type AuthSsoProvidersId = string;
  * Represents the table auth.sso_providers
  * Auth: Manages SSO identity provider information; see saml_providers for SAML.
  */
-export default interface SsoProvidersTable {
+export interface SsoProvidersTable {
   id: ColumnType<AuthSsoProvidersId, AuthSsoProvidersId, AuthSsoProvidersId>;
 
   /** Auth: Uniquely identifies a SSO provider according to a user-chosen resource ID (case insensitive), useful in infrastructure as code. */

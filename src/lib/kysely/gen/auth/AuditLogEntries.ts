@@ -10,7 +10,7 @@ export type AuthAuditLogEntriesId = string;
  * Represents the table auth.audit_log_entries
  * Auth: Audit trail for user actions.
  */
-export default interface AuditLogEntriesTable {
+export interface AuditLogEntriesTable {
   id: ColumnType<AuthAuditLogEntriesId, AuthAuditLogEntriesId, AuthAuditLogEntriesId>;
 
   instanceId: ColumnType<string | null, string | null, string | null>;

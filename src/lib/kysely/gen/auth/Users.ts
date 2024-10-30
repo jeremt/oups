@@ -10,7 +10,7 @@ export type AuthUsersId = string;
  * Represents the table auth.users
  * Auth: Stores user login data within a secure schema.
  */
-export default interface UsersTable {
+export interface UsersTable {
   id: ColumnType<AuthUsersId, AuthUsersId, AuthUsersId>;
 
   instanceId: ColumnType<string | null, string | null, string | null>;

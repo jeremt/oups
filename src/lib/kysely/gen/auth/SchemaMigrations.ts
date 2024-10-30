@@ -10,7 +10,7 @@ export type AuthSchemaMigrationsVersion = string;
  * Represents the table auth.schema_migrations
  * Auth: Manages updates to the auth system.
  */
-export default interface SchemaMigrationsTable {
+export interface SchemaMigrationsTable {
   version: ColumnType<AuthSchemaMigrationsVersion, AuthSchemaMigrationsVersion, AuthSchemaMigrationsVersion>;
 }
 

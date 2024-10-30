@@ -12,7 +12,7 @@ export type AuthSamlRelayStatesId = string;
  * Represents the table auth.saml_relay_states
  * Auth: Contains SAML Relay State information for each Service Provider initiated login.
  */
-export default interface SamlRelayStatesTable {
+export interface SamlRelayStatesTable {
   id: ColumnType<AuthSamlRelayStatesId, AuthSamlRelayStatesId, AuthSamlRelayStatesId>;
 
   ssoProviderId: ColumnType<AuthSsoProvidersId, AuthSsoProvidersId, AuthSsoProvidersId>;

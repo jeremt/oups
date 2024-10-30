@@ -10,7 +10,7 @@ export type AuthInstancesId = string;
  * Represents the table auth.instances
  * Auth: Manages users across multiple sites.
  */
-export default interface InstancesTable {
+export interface InstancesTable {
   id: ColumnType<AuthInstancesId, AuthInstancesId, AuthInstancesId>;
 
   uuid: ColumnType<string | null, string | null, string | null>;

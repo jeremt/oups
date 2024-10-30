@@ -11,7 +11,7 @@ export type AuthIdentitiesId = string;
  * Represents the table auth.identities
  * Auth: Stores identities associated to a user.
  */
-export default interface IdentitiesTable {
+export interface IdentitiesTable {
   id: ColumnType<AuthIdentitiesId, AuthIdentitiesId | undefined, AuthIdentitiesId>;
 
   providerId: ColumnType<string, string, string>;

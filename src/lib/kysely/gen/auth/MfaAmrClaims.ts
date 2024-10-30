@@ -11,7 +11,7 @@ export type AuthMfaAmrClaimsId = string;
  * Represents the table auth.mfa_amr_claims
  * auth: stores authenticator method reference claims for multi factor authentication
  */
-export default interface MfaAmrClaimsTable {
+export interface MfaAmrClaimsTable {
   id: ColumnType<AuthMfaAmrClaimsId, AuthMfaAmrClaimsId, AuthMfaAmrClaimsId>;
 
   sessionId: ColumnType<AuthSessionsId, AuthSessionsId, AuthSessionsId>;

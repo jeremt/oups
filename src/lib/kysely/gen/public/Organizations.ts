@@ -8,7 +8,7 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 export type PublicOrganizationsId = number;
 
 /** Represents the table public.organizations */
-export default interface OrganizationsTable {
+export interface OrganizationsTable {
   id: ColumnType<PublicOrganizationsId, never, never>;
 
   createdAt: ColumnType<Date, Date | string | undefined, Date | string>;

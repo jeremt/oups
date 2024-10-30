@@ -1,5 +1,5 @@
 import {json} from '@sveltejs/kit';
-import {kysely} from '$lib/kysely/kysely';
+import {jsonValue, kysely} from '$lib/kysely/kysely';
 import {createValidator} from '$lib/schema/validate';
 
 const validatePOST = createValidator({
@@ -48,7 +48,7 @@ export async function POST({request}) {
             .insertInto('public.documents')
             .values({
                 ...data,
-                lines: JSON.stringify(data.lines),
+                lines: jsonValue(data.lines),
                 type: 'invoice',
                 number: invoiceSequence - 1,
                 status: 'generated',

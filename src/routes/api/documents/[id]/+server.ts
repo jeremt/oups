@@ -1,9 +1,9 @@
-import {json} from '@sveltejs/kit';
-import {kysely} from '$lib/kysely/kysely';
+import {jsonValue, kysely} from '$lib/kysely/kysely';
 import {createValidator} from '$lib/schema/validate';
 import {Companies} from '$lib/kysely/gen/public/Companies';
-import {sql} from 'kysely';
 import {Clients} from '$lib/kysely/gen/public/Clients';
+import {sql} from 'kysely';
+import {json} from '@sveltejs/kit';
 
 const validatePUT = createValidator({
     $schema: 'http://json-schema.org/draft-07/schema#',
@@ -44,9 +44,10 @@ export async function PUT({params, request}) {
     if (!validatePUT(data)) {
         return json({error: validatePUT.errors}, {status: 400});
     }
+
     const invoice = await kysely
         .updateTable('public.documents')
-        .set({...data, lines: JSON.stringify(data.lines)})
+        .set({...data, lines: jsonValue(data.lines)})
         .where('id', '=', parseInt(params.id))
         .returningAll()
         .executeTakeFirst();
