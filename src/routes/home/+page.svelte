@@ -38,7 +38,7 @@
         <button class="btn" onclick={() => (isDocumentOpen = true)}>Créer</button>
         <ColorSchemeToggle />
         <form method="POST" action="/auth/logout">
-            <button class="btn" style:background-color="var(--color-fg)" type="submit">Déconnexion</button>
+            <button class="btn" style:--bg="var(--color-fg)" style:--focus="var(--color-primary)" type="submit">Déconnexion</button>
         </form>
     </header>
     <table>
@@ -72,6 +72,11 @@
         onCreated={document => documents.push(document)}
         onEdited={document => {
             documents = documents.map(d => (d.id === document.id ? document : d));
+            selected = undefined;
+        }}
+        onRemove={id => {
+            console.log(documents, id);
+            documents = documents.filter(doc => doc.id !== id);
             selected = undefined;
         }}
     />

@@ -18,8 +18,9 @@
         companies: Company[];
         onCreated: (document: Document) => void;
         onEdited: (document: Document) => void;
+        onRemove: (id: number) => void;
     };
-    let {isOpen = $bindable(false), companies = $bindable(), selected, onEdited, onCreated}: Props = $props();
+    let {isOpen = $bindable(false), companies = $bindable(), selected, onEdited, onCreated, onRemove}: Props = $props();
 
     type NewDocument = Omit<NewDocuments, 'createdAt' | 'updatedAt'> & {companyId?: number; company?: Companies; clientId?: number; client?: Clients; emittedAt: string};
 
@@ -97,6 +98,19 @@
         }
     }
 
+    async function remove() {
+        const response = await fetch(`/api/documents/${selected!.id}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+        });
+        if (response.status === 200) {
+            onRemove(selected!.id);
+            isOpen = false;
+        } else {
+            console.error(await response.json());
+        }
+    }
+
     $effect(() => {
         (async () => {
             if (isOpen && !selected) {
@@ -131,12 +145,13 @@
 <Dialog {isOpen} onrequestclose={() => (isOpen = false)}>
     <div class="editor">
         <header>
-            <button aria-label="Retour" class="icon" style:margin-right="auto" onclick={() => (isOpen = false)}>
+            <button aria-label="Retour" class="icon" onclick={() => (isOpen = false)}>
                 <Cross />
             </button>
+            <div class="title" style:margin-right="auto">{selected ? 'Éditer le document' : 'Nouveau document'}</div>
             {#if selected}
                 <a role="button" href="/api/documents/{selected.id}/pdf">Télécharger</a>
-                <button class="btn" onclick={edit} {disabled}>Editer</button>
+                <button class="btn" onclick={edit} {disabled}>Sauvegarder</button>
             {:else}
                 <button class="btn" onclick={create} {disabled}>Créer</button>
             {/if}
@@ -263,7 +278,9 @@
             </div>
             <label for="note">Ajouter des notes & infos supplémentaires sur cette facture :</label>
             <ResizeInput bind:value={document.note} placeholder="Erreurs éventuelles, situation spécifiques, etc." />
+            {#if selected}<div><button class="btn error" onclick={remove} style:--bg="var(--color-error)">Supprimer le document</button></div>{/if}
         </div>
+        <!-- /.config -->
     </div>
 </Dialog>
 <SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (document.client = client)} />
@@ -280,6 +297,10 @@
             align-items: center;
             margin-bottom: 1rem;
         }
+    }
+    .title {
+        font-weight: bold;
+        font-size: 1.2rem;
     }
     .config {
         display: flex;

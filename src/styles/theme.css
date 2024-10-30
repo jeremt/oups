@@ -58,7 +58,7 @@ a[role='button'].btn,
 button.btn {
     color: var(--fg, var(--color-bg));
     background: var(--bg, var(--color-primary));
-    border: 2px solid var(--color-primary);
+    border: 2px solid var(--bg, var(--color-primary));
     transition: var(--transition, all 0.3s);
     font-family: var(--font-ui);
     font-weight: bold;
@@ -72,7 +72,7 @@ button.btn {
         translate: 0 0.2em;
     }
     &:focus {
-        border: 2px solid var(--color-fg);
+        border: 2px solid var(--focus, var(--color-fg));
     }
     &:disabled {
         cursor: default;
