@@ -3,6 +3,7 @@
     import type {Document} from '$lib/kysely/queries';
     import type {DocumentLine} from '$lib/kysely/types';
     import type DocumentStatus from '$lib/kysely/gen/public/DocumentStatus';
+    import Pen from '$lib/icons/Pen.svelte';
 
     type Props = {
         document: Document;
@@ -36,7 +37,6 @@
 
 <tr>
     <td class="name">{document.name} nº{document.number}</td>
-    <td>{document.company.name}</td>
     <td style:color={statusMap[status].color} onclick={() => selectElement.click()}>
         {statusMap[status].name}
         <select bind:this={selectElement} value={status} onchange={handleStatusChange}>
@@ -46,10 +46,11 @@
             <option value="declared">déclarée</option>
         </select>
     </td>
-    <td>{formatDate(new Date(document.createdAt))}</td>
     <td>{formatDate(new Date(document.emittedAt))}</td>
-    <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)}</td>
+    <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)} €</td>
+    <td>{document.company.name}</td>
     <td class="note">{@html document.note}</td>
+    <td><button class="icon button" aria-label="Éditer"><Pen /></button></td>
 </tr>
 
 <style>

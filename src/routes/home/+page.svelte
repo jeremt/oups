@@ -36,12 +36,12 @@
         <thead>
             <tr>
                 <th>Nom</th>
-                <th>Organisation</th>
                 <th>Statut</th>
-                <th>Crée le</th>
-                <th>Editée le</th>
+                <th>Émis le</th>
                 <th>Prix</th>
+                <th>Entreprise</th>
                 <th>Notes</th>
+                <th>Editer</th>
             </tr>
         </thead>
         <tbody>
