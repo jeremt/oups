@@ -4,10 +4,6 @@ export interface JsonSchemaAll<T> {
     //
     title?: string;
     description?: string;
-    //
-    editor?: {
-        suggestions?: string[];
-    };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
