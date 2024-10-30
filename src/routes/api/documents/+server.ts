@@ -34,7 +34,7 @@ export async function POST({request}) {
     if (!validatePOST(data)) {
         return json({error: validatePOST.errors}, {status: 400});
     }
-    const document = await kysely.transaction().execute(async trx => {
+    const {id} = await kysely.transaction().execute(async trx => {
         const {quoteSequence} = await trx
             .updateTable('public.companies')
             .set(eb => ({quoteSequence: eb('public.companies.quoteSequence', '+', 1)}))
@@ -50,8 +50,8 @@ export async function POST({request}) {
                 number: quoteSequence - 1,
                 status: 'generated',
             })
-            .returningAll()
+            .returning('public.documents.id')
             .executeTakeFirstOrThrow();
     });
-    return json(document);
+    return json({id});
 }

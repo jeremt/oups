@@ -5,7 +5,17 @@
 
     let {data} = $props();
 
+    const documents = $state(data.documents);
     let isDocumentOpen = $state(false);
+
+    async function onDocumentAdded(documentId: number) {
+        const response = await fetch(`/api/documents/${documentId}`);
+        if (response.status === 200) {
+            documents.push(await response.json());
+        } else {
+            console.error(await response.json());
+        }
+    }
 </script>
 
 <svelte:head>
@@ -45,12 +55,12 @@
             </tr>
         </thead>
         <tbody>
-            {#each data.documents as document}
+            {#each documents as document}
                 <TableLine {document} />
             {/each}
         </tbody>
     </table>
-    <DocumentDialog bind:isOpen={isDocumentOpen} companies={data.companies} />
+    <DocumentDialog bind:isOpen={isDocumentOpen} companies={data.companies} {onDocumentAdded} />
 </main>
 
 <style>

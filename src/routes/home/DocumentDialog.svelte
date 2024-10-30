@@ -15,8 +15,9 @@
     type Props = {
         isOpen: boolean;
         companies: Company[];
+        onDocumentAdded: (documentId: number) => void;
     };
-    let {isOpen = $bindable(false), companies}: Props = $props();
+    let {isOpen = $bindable(false), companies, onDocumentAdded}: Props = $props();
 
     let isClientsOpen = $state(false);
     let isCompaniesOpen = $state(false);
@@ -25,7 +26,7 @@
         id: 1,
         clientId: 1,
         organizationId: null,
-        companyId: 1,
+        companyId: companies[0]?.id ?? 1,
         createdAt: new Date(),
         updatedAt: new Date(),
         emittedAt: new Date().toISOString(),
@@ -59,7 +60,7 @@
             logoUrl: null,
             email: null,
         },
-        company: {
+        company: companies[0] ?? {
             id: 1,
             quoteSequence: 14,
             invoiceSequence: 1,
@@ -100,6 +101,9 @@
             headers: {'Content-Type': 'application/json'},
         });
         if (response.status === 200) {
+            const {id: documentId} = await response.json();
+            console.log(documentId);
+            onDocumentAdded(documentId);
             isOpen = false;
         } else {
             console.error(await response.json());
