@@ -228,7 +228,7 @@
             </div>
         </div>
         <!-- /.invoice -->
-        <textarea style:margin-top="1rem" placeholder="Information supplémentaires sur la facture"></textarea>
+        <textarea bind:value={invoice.note} style:margin-top="1rem" placeholder="Information supplémentaires sur la facture"></textarea>
     </div>
 </Dialog>
 <SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (invoice.client = client)} />

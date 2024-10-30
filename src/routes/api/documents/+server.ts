@@ -8,6 +8,7 @@ const validatePOST = createValidator({
     additionalProperties: false,
     properties: {
         name: {type: 'string'},
+        note: {type: 'string'},
         clientId: {type: 'number'},
         companyId: {type: 'number'},
         emittedAt: {type: 'string'},
