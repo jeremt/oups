@@ -22,7 +22,7 @@
     let isClientsOpen = $state(false);
     let isCompaniesOpen = $state(false);
     let mode = $state<'add' | 'edit'>('add');
-    let invoice = $state<Omit<Documents, 'emittedAt'> & {company: Companies; client: Clients; emittedAt: string}>({
+    let document = $state<Omit<Documents, 'emittedAt'> & {company: Companies; client: Clients; emittedAt: string}>({
         id: 1,
         clientId: 1,
         organizationId: null,
@@ -49,7 +49,7 @@
         note: '',
         type: 'invoice',
         quantityBase: 600,
-        quantityLabel: 'jour',
+        quantityLabel: 'Jours',
         client: {
             id: 1,
             companyId: 1,
@@ -79,10 +79,10 @@
     let newLine = $state<DocumentLine>({description: '', price: 0});
     function addOrRemoveLine(line: DocumentLine, index: number) {
         if (index === -1 && line.description.length > 0 && line.price > 0) {
-            (invoice.lines as DocumentLine[]).push({...line});
+            (document.lines as DocumentLine[]).push({...line});
             newLine = {description: '', price: 0};
         } else if (index !== -1 && line.description.length === 0 && !line.price) {
-            (invoice.lines as DocumentLine[]).splice(index, 1);
+            (document.lines as DocumentLine[]).splice(index, 1);
         }
     }
 
@@ -97,7 +97,7 @@
     async function add() {
         const response = await fetch(`/api/documents`, {
             method: 'POST',
-            body: JSON.stringify({...invoice, clientId: invoice.client.id, companyId: invoice.company.id}),
+            body: JSON.stringify({...document, clientId: document.client.id, companyId: document.company.id}),
             headers: {'Content-Type': 'application/json'},
         });
         if (response.status === 200) {
@@ -117,17 +117,14 @@
             <button aria-label="Retour" class="icon" onclick={() => (isOpen = false)}>
                 <Cross />
             </button>
-            <input type="number" style:width="5rem" placeholder="600" />
-            <label for="quantityLabel" style:font-size="1rem">€ /</label>
-            <input id="quantityLabel" style:width="5rem" type="text" placeholder="Jours" />
             <a role="button" style:margin-left="auto" href="/api/invoices/id/pdf">Télécharger</a>
             {#if mode === 'add'}
                 <button class="btn" onclick={add}>Créer</button>
             {/if}
         </header>
         <div class="invoice" use:resize={onResize} style:--ratio={ratio} style:height="{height}px">
-            {#if invoice.company}
-                {@const company = invoice.company}
+            {#if document.company}
+                {@const company = document.company}
                 <div
                     class="company"
                     onclick={() => (isCompaniesOpen = true)}
@@ -145,10 +142,10 @@
                     {#if company.email}<div class="email">{company.email}</div>{/if}
                     {#if company.siren}<div>SIREN : {company.siren}</div>{/if}
                 </div>
-                <div class="date">Date d'émission : <input type="date" class="invisible" value={invoice.emittedAt} /></div>
+                <div class="date">Date d'émission : <input type="date" class="invisible" value={document.emittedAt} /></div>
             {/if}
-            {#if invoice.clientId}
-                {@const client = invoice.client}
+            {#if document.clientId}
+                {@const client = document.client}
                 <div
                     class="client"
                     onclick={() => (isClientsOpen = true)}
@@ -166,7 +163,7 @@
                 </div>
             {/if}
             <div class="infos">
-                <div class="title">Facture nº{invoice.number} : <input type="text" class="invisible" placeholder="Titre" bind:value={invoice.name} /></div>
+                <div class="title">Facture nº{document.number} : <input type="text" class="invisible" placeholder="Titre" bind:value={document.name} /></div>
                 <table>
                     <thead>
                         <tr>
@@ -175,7 +172,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#each invoice.lines as DocumentLine[] as line, i}
+                        {#each document.lines as DocumentLine[] as line, i}
                             <tr>
                                 <td>
                                     <ResizeInput
@@ -192,7 +189,7 @@
                                     </div>
                                 </td>
                                 <td style:padding="0" style:border="none" style:width="{10 * ratio}px"
-                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => (invoice.lines as DocumentLine[]).splice(i, 1)}
+                                    ><button class="remove-line icon" style:color="var(--color-fg-2)" onclick={() => (document.lines as DocumentLine[]).splice(i, 1)}
                                         ><Trash --size="{ratio * 12}px" /></button
                                     ></td
                                 >
@@ -217,22 +214,41 @@
                     </tbody>
                 </table>
                 <div style:font-weight="bold" style:text-align="right" style:margin-top="{20 * ratio}px">
-                    Total (HT) : {(invoice.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €
+                    Total (HT) : {(document.lines as DocumentLine[]).reduce((total, line) => total + line.price, 0)} €
                 </div>
                 <div style:text-align="right">TVA Non applicable</div>
-                {#if invoice.companyId}
-                    {@const company = invoice.company}
+                {#if document.companyId}
+                    {@const company = document.company}
                     <div class="payment-title">Informations de paiement</div>
                     <div class="payment-infos">BIC : {company.bic}<br />IBAN : {company.iban}</div>
                 {/if}
             </div>
         </div>
         <!-- /.invoice -->
-        <textarea bind:value={invoice.note} style:margin-top="1rem" placeholder="Information supplémentaires sur la facture"></textarea>
+        <div class="config">
+            <label for="quantityBase">Ajouter une colonne pour quantifier chaque ligne en fonction d'un prix de base :</label>
+            <div>
+                <input id="quantityBase" type="number" style:width="5rem" bind:value={document.quantityBase} placeholder="600" />
+                <label for="quantityLabel" style:font-size="1rem">€ /</label>
+                <input id="quantityLabel" style:width="5rem" type="text" bind:value={document.quantityLabel} placeholder="Jours" />
+            </div>
+            <label for="discountPrice">Ajouter un prix arbitraire pour le total avec réduction :</label>
+            <div>
+                <input id="discountPrice" type="number" style:width="5rem" placeholder="600" />
+                <span style:font-size="1rem">€</span>
+            </div>
+            <label for="depositPercent">Ajouter un % d'acompte en fonction du prix total :</label>
+            <div>
+                <input id="depositPercent" type="number" style:width="5rem" placeholder="30" />
+                <span style:font-size="1rem">%</span>
+            </div>
+            <label for="note">Ajouter des notes & infos supplémentaires sur cette facture :</label>
+            <ResizeInput bind:value={document.note} placeholder="Erreurs éventuelles, situation spécifiques, etc." />
+        </div>
     </div>
 </Dialog>
-<SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (invoice.client = client)} />
-<SearchCompanyDialog bind:isOpen={isCompaniesOpen} onSelect={company => (invoice.company = company)} {companies} />
+<SearchClientDialog bind:isOpen={isClientsOpen} onSelect={client => (document.client = client)} />
+<SearchCompanyDialog bind:isOpen={isCompaniesOpen} onSelect={company => (document.company = company)} {companies} />
 
 <style>
     .editor {
@@ -245,6 +261,12 @@
             align-items: center;
             margin-bottom: 1rem;
         }
+    }
+    .config {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1.5rem 1rem 0;
     }
 
     .invoice {
