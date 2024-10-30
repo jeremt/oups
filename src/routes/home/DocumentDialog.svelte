@@ -37,6 +37,8 @@
                   number: 0,
                   quantityBase: 0,
                   quantityLabel: '',
+                  discountPrice: 0,
+                  depositPercent: 0,
                   status: 'generated',
                   type: 'invoice',
                   lines: [],
@@ -249,14 +251,14 @@
                 <label for="quantityLabel" style:font-size="1rem">€ /</label>
                 <input id="quantityLabel" style:width="5rem" type="text" bind:value={document.quantityLabel} placeholder="Jours" />
             </div>
-            <label for="discountPrice">Ajouter un prix arbitraire pour le total avec réduction :</label>
+            <label for="discountPrice">Ajouter un prix arbitraire pour le total avec réduction (0 est ignoré) :</label>
             <div>
-                <input id="discountPrice" type="number" style:width="5rem" placeholder="600" />
+                <input id="discountPrice" type="number" style:width="5rem" bind:value={document.discountPrice} placeholder="600" />
                 <span style:font-size="1rem">€</span>
             </div>
             <label for="depositPercent">Ajouter un % d'acompte en fonction du prix total :</label>
             <div>
-                <input id="depositPercent" type="number" style:width="5rem" placeholder="30" />
+                <input id="depositPercent" type="number" style:width="5rem" bind:value={document.depositPercent} placeholder="30" />
                 <span style:font-size="1rem">%</span>
             </div>
             <label for="note">Ajouter des notes & infos supplémentaires sur cette facture :</label>

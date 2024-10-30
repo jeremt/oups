@@ -42,6 +42,10 @@ export default interface DocumentsTable {
   quantityBase: ColumnType<number, number, number>;
 
   quantityLabel: ColumnType<string, string, string>;
+
+  discountPrice: ColumnType<number, number | undefined, number>;
+
+  depositPercent: ColumnType<number, number | undefined, number>;
 }
 
 export type Documents = Selectable<DocumentsTable>;

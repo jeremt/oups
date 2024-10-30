@@ -26,8 +26,10 @@ const validatePOST = createValidator({
         organisationId: {type: 'number'},
         quantityLabel: {type: 'string'},
         quantityBase: {type: 'number'},
+        depositPercent: {type: 'number'},
+        discountPrice: {type: 'number'},
     },
-    required: ['clientId', 'companyId', 'emittedAt', 'lines', 'name', 'quantityLabel', 'quantityBase'],
+    required: ['clientId', 'companyId', 'emittedAt', 'lines', 'name', 'quantityLabel', 'quantityBase', 'depositPercent', 'discountPrice'],
 });
 
 export async function POST({request}) {

@@ -31,13 +31,16 @@ const validatePUT = createValidator({
                 required: ['description', 'price'],
             },
         },
-        quantity_label: {type: 'string'},
+        quantityLabel: {type: 'string'},
+        quantityBase: {type: 'number'},
+        depositPercent: {type: 'number'},
+        discountPrice: {type: 'number'},
     },
     required: ['name', 'status', 'emittedAt'],
 });
 
 export async function PUT({params, request}) {
-    const data = await request.json(); // cast in necessary because status enum is not properly infered
+    const data = await request.json();
     if (!validatePUT(data)) {
         return json({error: validatePUT.errors}, {status: 400});
     }
