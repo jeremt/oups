@@ -28,7 +28,7 @@
     let isCompaniesOpen = $state(false);
     let document = $state<NewDocument>(
         selected
-            ? {...selected, emittedAt: selected.emittedAt.toISOString()}
+            ? {...selected, emittedAt: formatDateForInput(selected.emittedAt)}
             : {
                   clientId: 0,
                   companyId: 0,
@@ -45,6 +45,7 @@
                   note: '',
               },
     );
+
     let newLine = $state<DocumentLine>({description: '', price: 0});
 
     function addOrRemoveLine(line: DocumentLine, index: number) {
