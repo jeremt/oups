@@ -79,7 +79,12 @@
     </div>
 </Dialog>
 
-<CreateEditClientDialog bind:isOpen={isCreateOrEditOpen} {selectedClient} />
+<CreateEditClientDialog
+    bind:isOpen={isCreateOrEditOpen}
+    selected={selectedClient}
+    onEdit={client => (clients = clients.map(c => (c.id === client.id ? client : c)))}
+    onCreate={client => clients.push(client)}
+/>
 
 <style>
     header {

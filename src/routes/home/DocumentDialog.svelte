@@ -17,7 +17,7 @@
         companies: Company[];
         onDocumentAdded: (documentId: number) => void;
     };
-    let {isOpen = $bindable(false), companies, onDocumentAdded}: Props = $props();
+    let {isOpen = $bindable(false), companies = $bindable(), onDocumentAdded}: Props = $props();
 
     let isClientsOpen = $state(false);
     let isCompaniesOpen = $state(false);

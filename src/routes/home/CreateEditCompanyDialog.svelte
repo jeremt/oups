@@ -1,16 +1,3 @@
-<script module>
-    const defaultCompany: NewCompanies = {
-        name: '',
-        bic: '',
-        iban: '',
-        siren: '',
-        address: '',
-        phone: '',
-        email: '',
-        logoUrl: '',
-    };
-</script>
-
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
     import Dialog from '$lib/widgets/Dialog.svelte';
@@ -21,10 +8,23 @@
     type Props = {
         isOpen: boolean;
         selected?: Company;
+        onEdit: (company: Company) => void;
+        onCreate: (company: Company) => void;
     };
 
-    let {isOpen = $bindable(false), selected = $bindable(undefined)}: Props = $props();
+    let {isOpen = $bindable(false), selected = $bindable(undefined), onEdit, onCreate}: Props = $props();
     let error = $state('');
+
+    const defaultCompany: NewCompanies = {
+        name: '',
+        bic: '',
+        iban: '',
+        siren: '',
+        address: '',
+        phone: '',
+        email: '',
+        logoUrl: '',
+    };
 
     let company = $state<NewCompanies>(selected ?? defaultCompany);
 
@@ -35,6 +35,7 @@
         });
         if (response.status === 200) {
             isOpen = false;
+            onCreate((await response.json()) as Company);
         } else {
             error = (await response.json())?.message;
         }
@@ -46,6 +47,7 @@
         });
         if (response.status === 200) {
             isOpen = false;
+            onEdit((await response.json()) as Company);
         } else {
             error = (await response.json())?.message;
         }

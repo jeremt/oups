@@ -1,13 +1,3 @@
-<script module>
-    const defaultClient: NewClients = {
-        name: '',
-        address: '',
-        email: '',
-        logoUrl: '',
-        companyId: 1,
-    };
-</script>
-
 <script lang="ts">
     import Cross from '$lib/icons/Cross.svelte';
     import type {Clients, NewClients} from '$lib/kysely/gen/public/Clients';
@@ -18,14 +8,23 @@
 
     type Props = {
         isOpen: boolean;
-        selectedClient?: Clients;
+        selected?: Clients;
+        onEdit: (client: Clients) => void;
+        onCreate: (client: Clients) => void;
     };
 
-    let {isOpen = $bindable(false), selectedClient = $bindable(undefined)}: Props = $props();
+    let {isOpen = $bindable(false), selected = $bindable(undefined), onCreate, onEdit}: Props = $props();
     let error = $state('');
     let options = $state<Option[]>([]);
 
-    let client = $state<NewClients>(selectedClient ?? defaultClient);
+    const defaultClient: NewClients = {
+        name: '',
+        address: '',
+        email: '',
+        logoUrl: '',
+        companyId: 1,
+    };
+    let client = $state<NewClients>(selected ?? defaultClient);
 
     async function createClient() {
         const response = await fetch(`/api/clients`, {
@@ -34,17 +33,19 @@
         });
         if (response.status === 200) {
             isOpen = false;
+            onCreate((await response.json()) as Clients);
         } else {
             error = (await response.json())?.message;
         }
     }
     async function editClient() {
-        const response = await fetch(`/api/clients/${selectedClient!.id}`, {
+        const response = await fetch(`/api/clients/${selected!.id}`, {
             method: 'PATCH',
             body: JSON.stringify(client),
         });
         if (response.status === 200) {
             isOpen = false;
+            onEdit((await response.json()) as Clients);
         } else {
             error = (await response.json())?.message;
         }
@@ -64,7 +65,7 @@
     });
 
     $effect(() => {
-        client = selectedClient ?? defaultClient;
+        client = selected ?? defaultClient;
     });
 </script>
 
@@ -73,7 +74,7 @@
         <button aria-label="Retour" class="icon" onclick={() => (isOpen = false)}>
             <Cross />
         </button>
-        {#if selectedClient === undefined}
+        {#if selected === undefined}
             <div class="title">Créer un client</div>
             <button class="btn" onclick={createClient}>Créer</button>
         {:else}

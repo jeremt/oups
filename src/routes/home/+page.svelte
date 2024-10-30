@@ -5,7 +5,7 @@
 
     let {data} = $props();
 
-    const documents = $state(data.documents);
+    let documents = $state(data.documents);
     let isDocumentOpen = $state(false);
 
     async function onDocumentAdded(documentId: number) {
@@ -60,7 +60,7 @@
             {/each}
         </tbody>
     </table>
-    <DocumentDialog bind:isOpen={isDocumentOpen} companies={data.companies} {onDocumentAdded} />
+    <DocumentDialog bind:isOpen={isDocumentOpen} bind:companies={data.companies} {onDocumentAdded} />
 </main>
 
 <style>

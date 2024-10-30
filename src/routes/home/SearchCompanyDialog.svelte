@@ -8,7 +8,7 @@
     import CreateEditCompanyDialog from './CreateEditCompanyDialog.svelte';
 
     type Props = {isOpen: boolean; onSelect: (company: Company) => void; companies: Company[]};
-    let {isOpen = $bindable(false), onSelect, companies}: Props = $props();
+    let {isOpen = $bindable(false), onSelect, companies = $bindable()}: Props = $props();
 
     let query = $state('');
     let selected = $state<Company | undefined>(undefined);
@@ -42,7 +42,7 @@
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="card"
-                onclick={e => {
+                onclick={() => {
                     onSelect(company);
                     isOpen = false;
                 }}
@@ -65,7 +65,12 @@
     </div>
 </Dialog>
 
-<CreateEditCompanyDialog bind:isOpen={isCreateOrEditOpen} {selected} />
+<CreateEditCompanyDialog
+    bind:isOpen={isCreateOrEditOpen}
+    {selected}
+    onEdit={company => (companies = companies.map(c => (c.id === company.id ? company : c)))}
+    onCreate={company => companies.push(company)}
+/>
 
 <style>
     header {
