@@ -1,7 +1,8 @@
 <script lang="ts">
     import type {Document} from '$lib/kysely/queries';
-    import type DocumentStatus from '$lib/kysely/gen/public/DocumentStatus';
+    import type {DocumentStatus} from '$lib/kysely/gen/public/DocumentStatus';
     import Chevron from '$lib/icons/Chevron.svelte';
+
     type Props = {
         document: Document;
     };

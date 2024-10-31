@@ -2,8 +2,8 @@ import {kysely} from '$lib/kysely/kysely';
 import {sql} from 'kysely';
 import type {Clients} from './gen/public/Clients';
 import type {Companies} from './gen/public/Companies';
+import type {DocumentType} from './gen/public/DocumentType';
 import type {ConnectedUser} from '$lib/supabase/user';
-import type DocumentType from './gen/public/DocumentType';
 
 export async function getCompanies(user: ConnectedUser) {
     const companies = await kysely

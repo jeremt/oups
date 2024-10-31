@@ -1,9 +1,9 @@
 <script lang="ts">
     import {formatDate} from '$lib/helpers/formatDate';
     import type {Document} from '$lib/kysely/queries';
-    import type {DocumentLine} from '$lib/kysely/types';
     import Pen from '$lib/icons/Pen.svelte';
     import StatusPicker from './StatusPicker.svelte';
+    import type {PublicDocumentsLines} from '$lib/kysely/gen/public/Documents';
 
     type Props = {
         document: Document;
@@ -16,7 +16,7 @@
     <td class="name">{document.name} nº{document.number}</td>
     <td><StatusPicker {document} /></td>
     <td>{formatDate(new Date(document.emittedAt))}</td>
-    <td>{(document.lines as DocumentLine[]).reduce((total, l) => total + l.price, 0)} €</td>
+    <td>{(document.lines as PublicDocumentsLines).reduce((total, l) => total + l.price, 0)} €</td>
     <td>{document.company.name}</td>
     <td class="note">{@html document.note}</td>
     <td><button class="icon button" aria-label="Éditer" onclick={() => onSelect(document)}><Pen /></button></td>
