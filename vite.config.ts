@@ -3,7 +3,6 @@ import {sveltekit} from '@sveltejs/kit/vite';
 import {defineConfig, type Plugin} from 'vitest/config';
 import path from 'path';
 import {writeFile} from 'fs/promises';
-import {writeFileSync} from 'fs';
 
 export default defineConfig({
     plugins: [sveltekit(), P()],
@@ -16,20 +15,68 @@ function P(): Plugin {
     let config: ts.ParsedCommandLine;
     let host: ts.CompilerHost;
     let program: ts.Program;
+    let projectPath = '';
+    let serverEndpointPathRegex: RegExp;
 
+    async function parseProject() {
+        const output: Record<string, {method: string; returnType: unknown}[]> = {};
+
+        host = ts.createCompilerHost(config.options);
+
+        program = ts.createProgram({
+            rootNames: config.fileNames,
+            options: config.options,
+            oldProgram: program,
+            host: host,
+        });
+
+        const sourceFiles = program.getSourceFiles();
+        const typeChecker = program.getTypeChecker();
+
+        for (const sourceFile of sourceFiles) {
+            const relativePath = sourceFile.fileName.replace(`${projectPath}/src/routes`, '').replace('+server.ts', '');
+
+            if (serverEndpointPathRegex.test(sourceFile.fileName)) {
+                ts.forEachChild(sourceFile, node => {
+                    if (!ts.canHaveModifiers(node) || !node.modifiers?.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword)) {
+                        return;
+                    }
+                    if (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) || ts.isArrowFunction(node)) {
+                        if (node.body) {
+                            ts.forEachChild(node.body, child => {
+                                if (ts.isReturnStatement(child)) {
+                                    const expression = child.expression;
+                                    if (expression && ts.isCallExpression(expression) && expression.expression.getText() === 'json') {
+                                        const type = typeChecker.getTypeAtLocation(expression.arguments[0]);
+                                        const returnType = renderType(typeChecker, child, type);
+                                        const s = output[relativePath];
+                                        if (s) {
+                                            s.push({method: node.name!.text, returnType});
+                                        } else {
+                                            output[relativePath] = [{method: node.name!.text, returnType}];
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        await writeFile(`${projectPath}/src/lib/api.ts`, `export type Api = ${stringify(output)}`);
+    }
     return {
         name: 'svelteAPI',
         apply: 'serve',
         configureServer: async server => {
-            const stuff: Record<string, {method: string; returnType: unknown}[]> = {};
-
-            const projectPath = server.config.root;
-            const serverEndpointPathRegex = RegExp(`^(?:${projectPath}/)?src/routes(/.*)?/\\+server\\.(ts|js)$`);
+            projectPath = server.config.root;
 
             const configPath = ts.findConfigFile(projectPath, ts.sys.fileExists, 'tsconfig.json');
             if (!configPath) {
                 throw new Error("Could not find a valid 'tsconfig.json'.");
             }
+            serverEndpointPathRegex = RegExp(`^(?:${projectPath}/)?src/routes(/.*)?/\\+server\\.(ts|js)$`);
             config = ts.parseJsonConfigFileContent(
                 ts.readConfigFile(configPath, ts.sys.readFile).config,
                 ts.sys,
@@ -43,67 +90,22 @@ function P(): Plugin {
                 },
                 configPath,
             );
-            host = ts.createCompilerHost(config.options);
 
-            program = ts.createProgram({
-                rootNames: config.fileNames,
-                options: config.options,
-                oldProgram: program,
-                host: host,
-            });
+            await parseProject();
+        },
 
-            const sourceFiles = program.getSourceFiles();
-            const typeChecker = program.getTypeChecker();
-
-            for (const sourceFile of sourceFiles) {
-                const relativePath = sourceFile.fileName.replace(`${projectPath}/src/routes`, '').replace('+server.ts', '');
-
-                if (serverEndpointPathRegex.test(sourceFile.fileName)) {
-                    ts.forEachChild(sourceFile, node => {
-                        if (!ts.canHaveModifiers(node) || !node.modifiers?.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword)) {
-                            return;
-                        }
-                        if (ts.isVariableStatement(node)) {
-                            for (const declaration of node.declarationList.declarations) {
-                                console.log(declaration);
-                            }
-                        } else if (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) || ts.isArrowFunction(node)) {
-                            if (node.body) {
-                                ts.forEachChild(node.body, child => {
-                                    if (ts.isReturnStatement(child)) {
-                                        const expression = child.expression;
-                                        if (expression && ts.isCallExpression(expression) && expression.expression.getText() === 'json') {
-                                            const type = typeChecker.getTypeAtLocation(expression.arguments[0]);
-                                            // const returnType = typeChecker.typeToString(type, undefined, TypeFormatFlags.NoTruncation);
-                                            // const prop = type.getProperties()[0]
-                                            const returnType = renderType(typeChecker, child, type);
-                                            console.log(returnType);
-                                            const s = stuff[relativePath];
-                                            if (s) {
-                                                s.push({method: node.name!.text, returnType});
-                                            } else {
-                                                stuff[relativePath] = [{method: node.name!.text, returnType}];
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
+        handleHotUpdate: async ctx => {
+            if (serverEndpointPathRegex.test(ctx.file)) {
+                parseProject();
             }
-
-            await writeFile(`${projectPath}/src/lib/api.ts`, `export type Api = ${stringify(stuff)}`);
         },
     };
 }
 
 function renderType(typeChecker: ts.TypeChecker, node: ts.Node, type: ts.Type) {
     const typeInfo = analyzeType(node, type, typeChecker);
-    writeFileSync('out.json', JSON.stringify(typeInfo, null, 4));
 
     const render = ({kind, typeName, subtypes}: TypeInfo): string | undefined => {
-        // console.log(`render ${kind} ${typeName} ${name}`);
         switch (kind) {
             case 'function': {
                 return '';
@@ -215,7 +217,6 @@ function analyzeType(node: ts.Node, type: ts.Type, checker: ts.TypeChecker, seen
     }
     // Handle union types
     if (type.isUnion() || type.isIntersection()) {
-        console.log(typeName);
         typeInfo.subtypes = type.types.map(t => analyzeType(node, t, checker, new Set(seen)));
         return typeInfo;
     }
