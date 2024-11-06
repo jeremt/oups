@@ -14,7 +14,8 @@
         "test:integration": "playwright test",
         "test:unit": "vitest",
         "kysely:gentypes": "kanel",
-        "kysely:migrate": "tsx database/migrate.ts"
+        "kysely:migrate": "tsx database/migrate.ts",
+        "kysely:seed": "tsx database/seed.ts"
     },
     "devDependencies": {
         "@playwright/test": "^1.28.1",
